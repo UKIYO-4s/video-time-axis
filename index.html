@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>動画は、時間軸のあるデザイン</title>
+<style>
+  :root { --bg: #121314; --panel: #1a1b1d; --line: #2a2c2f; --text: #e6e8e9; --muted: #9a9fa3; --accent: #22d3ee; --error: #ff8a8a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.lead { color: var(--muted); margin: 0 0 16px; font-size: 14px; line-height: 1.7; }
+  #screen { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; background: #000; border: 1px solid var(--line); border-radius: 12px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+  button { font: inherit; font-size: 14px; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+  button.primary { border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  input[type=range] { flex: 1; min-width: 160px; accent-color: var(--accent); }
+  #counter { font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: var(--muted); min-width: 15em; text-align: right; }
+  #status { margin-top: 12px; font-size: 13px; color: var(--muted); white-space: pre-wrap; min-height: 1.5em; }
+  #status.error { color: var(--error); }
+  #hidden { position: absolute; width: 0; height: 0; overflow: hidden; }
+  footer { margin-top: 32px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+  footer a { color: var(--muted); }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/jsm/" } }
+</script>
+<script src="./settings.js"></script>
+</head>
+<body>
+<main>
+  <h1>動画は、時間軸のあるデザイン</h1>
+  <p class="lead">1枚ずつ描いた絵を、時間の順に並べています。スライダーを動かすと、1コマずつ確かめられます。</p>
+  <canvas id="screen" width="1200" height="900"></canvas>
+  <div class="bar">
+    <button id="play" disabled>再生</button>
+    <input id="seek" type="range" min="0" max="0" value="0" disabled>
+    <span id="counter">読み込み中</span>
+  </div>
+  <div class="bar">
+    <button id="export" class="primary" disabled>MP4で書き出す</button>
+  </div>
+  <div id="status" role="status"></div>
+  <div id="hidden" aria-hidden="true"></div>
+  <footer>
+    描画の土台は <a href="https://iso-glow.vercel.app">iso-glow</a>（April Zhu・MIT）と three.js（MIT）、MP4の書き出しは mp4-muxer（Vanilagy・MIT）を使っています。ライセンス文は licenses フォルダにあります。
+  </footer>
+</main>
+<script type="module" src="./engine/player.js"></script>
+</body>
+</html>
