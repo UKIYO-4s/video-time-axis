@@ -34221,7 +34221,7 @@
           this.setScript(script === "auto" ? this.fig.defaultScript || [] : JSON.parse(script));
           this.fps = cs.manifest.fps.numerator / cs.manifest.fps.denominator;
           this.prm = {};
-          ["camera", "orbit_deg", "orbit_frames", "zoom_start", "zoom_end", "zoom_frames"].forEach((k) => {
+          ["camera", "orbit_deg", "orbit_frames", "zoom_start", "zoom_end", "zoom_frames", "move_from"].forEach((k) => {
             this.prm[k] = cs.param(k);
           });
           this.ease = cs.ease[cs.param("easing")];
@@ -34262,8 +34262,8 @@
           }
           const aspect2 = C.width / C.height, dist0 = F.view.dist * Math.max(1, 1.45 / aspect2), mode = this.prm.camera;
           const pose = mode === "shots" && F.shots && F.shots.length ? G3.Shots.poseAt(frame, F.shots, this.ease) : { target: F.view.target, zoom: 1, orbit: 0 };
-          const tz = this.ease(Math.min(1, frame / Math.max(1, this.prm.zoom_frames))), zoom = pose.zoom * (this.prm.zoom_start + (this.prm.zoom_end - this.prm.zoom_start) * tz);
-          const to = this.ease(Math.min(1, frame / Math.max(1, this.prm.orbit_frames))), ang = MathUtils.degToRad(this.prm.orbit_deg * to + (pose.orbit || 0));
+          const tz = this.ease(Math.min(1, Math.max(0, frame - this.prm.move_from) / Math.max(1, this.prm.zoom_frames))), zoom = pose.zoom * (this.prm.zoom_start + (this.prm.zoom_end - this.prm.zoom_start) * tz);
+          const to = this.ease(Math.min(1, Math.max(0, frame - this.prm.move_from) / Math.max(1, this.prm.orbit_frames))), ang = MathUtils.degToRad(this.prm.orbit_deg * to + (pose.orbit || 0));
           const dir = new Vector3(1, 1, 1).normalize().applyAxisAngle(new Vector3(0, 1, 0), ang);
           const target = pose.target.isVector3 ? pose.target.clone() : W(...pose.target);
           const cam = mode === "iso" ? C.ortho : C.persp, dist = dist0 / zoom;
@@ -36212,7 +36212,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
 
   // engine/player.js
   var FONT = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
-  var MACHINES = ["camera", "phone", "projector"];
+  var CAMERAS = ["shots", "overview", "iso"];
   var EASE = {
     linear: (t) => t,
     ease_in_quad: (t) => t * t,
@@ -36242,9 +36242,25 @@ If you want to offset all timestamps of a track such that the first one is zero,
     if (!(S.width > 0 && S.width % 2 === 0 && S.height > 0 && S.height % 2 === 0)) problems.push("width と height は偶数にしてください");
     (S.scenes || []).forEach((sc, i) => {
       const n = `scenes の ${i + 1} 番目`;
-      if (!MACHINES.includes(sc.machine)) problems.push(`${n}: machine は ${MACHINES.join(" / ")} のどれかにしてください（いまは "${sc.machine}"）`);
+      if (typeof sc.machine !== "string" || !sc.machine) problems.push(`${n}: machine に機械の名前を書いてください`);
       if (!(Number.isInteger(sc.from) && Number.isInteger(sc.to) && sc.from >= 0 && sc.to > sc.from)) problems.push(`${n}: from と to は整数で、to を from より大きくしてください`);
       if (!/^#[0-9a-fA-F]{6}$/.test(sc.accent || "")) problems.push(`${n}: accent は #22d3ee のような6桁の色コードにしてください`);
+      if (sc.camera != null && !CAMERAS.includes(sc.camera)) problems.push(`${n}: camera は ${CAMERAS.join(" / ")} のどれかにしてください（いまは "${sc.camera}"）`);
+      if (sc.orbit != null && !Number.isFinite(sc.orbit)) problems.push(`${n}: orbit は回り込む角度を数字で書いてください（例: 45）`);
+      if (sc.zoom != null && !(Array.isArray(sc.zoom) && sc.zoom.length === 2 && sc.zoom.every((v) => v > 0))) problems.push(`${n}: zoom は [始まりの倍率, 終わりの倍率] で書いてください（例: [1, 1.8]）`);
+      if (sc.easing != null && !EASE[sc.easing]) problems.push(`${n}: easing は ${Object.keys(EASE).join(" / ")} のどれかにしてください`);
+      if (sc.theme != null && !["dark", "light"].includes(sc.theme)) problems.push(`${n}: theme は dark / light のどちらかにしてください`);
+      if (sc.touch != null && typeof sc.touch !== "boolean") problems.push(`${n}: touch は true / false で書いてください`);
+      if (sc.caption != null && typeof sc.caption !== "boolean") problems.push(`${n}: caption は true / false で書いてください`);
+      if (sc.script != null && !Array.isArray(sc.script)) problems.push(`${n}: script は [{ frame: 30, type: 'click', target: '名前' }] のような並びで書いてください`);
+      if (sc.shots != null) {
+        if (!Array.isArray(sc.shots) || !sc.shots.length) problems.push(`${n}: shots は1つ以上のカットの並びで書いてください`);
+        else sc.shots.forEach((sh, j) => {
+          if (!(Number.isInteger(sh.from) && sh.from >= 0) || j === 0 && sh.from !== 0 || j > 0 && sh.from <= sc.shots[j - 1].from) problems.push(`${n}: shots の ${j + 1} 番目: from は0から始まる昇順の整数にしてください`);
+          if (!(Array.isArray(sh.target) && sh.target.length === 3 && sh.target.every(Number.isFinite))) problems.push(`${n}: shots の ${j + 1} 番目: target は [x, y, z] で書いてください`);
+          if (!(sh.zoom > 0)) problems.push(`${n}: shots の ${j + 1} 番目: zoom は0より大きい数にしてください`);
+        });
+      }
     });
     if (problems.length) throw new StepError("settings.js の確認", problems.join("\n"));
   }
@@ -36254,22 +36270,24 @@ If you want to offset all timestamps of a track such that the first one is zero,
     canvas.height = S.height;
     const dom = document.createElement("div");
     box2.append(canvas, dom);
+    const zoom = sc.zoom || [1, 1];
     const cfg = {
-      slots: { script: "auto", label: sc.label || sc.machine.toUpperCase() },
+      slots: { script: sc.script ? JSON.stringify(sc.script) : "auto", label: sc.label || sc.machine.toUpperCase() },
       brand: { color_bg: "#121314", color_accent: sc.accent, color_text: "#e6e8e9", color_muted: "#4f5357", font_family: FONT },
       parameters: {
         machine: sc.machine,
-        theme: "dark",
-        camera: "shots",
+        theme: sc.theme || "dark",
+        camera: sc.camera || "shots",
         material: "line",
-        touch: "on",
-        orbit_deg: 0,
-        orbit_frames: 1,
-        zoom_start: 1,
-        zoom_end: 1,
-        zoom_frames: 1,
-        easing: "ease_in_out_cubic",
-        caption: "on"
+        touch: sc.touch === false ? "off" : "on",
+        orbit_deg: sc.orbit || 0,
+        orbit_frames: sc.orbit ? sc.to - sc.from : 1,
+        zoom_start: zoom[0],
+        zoom_end: zoom[1],
+        zoom_frames: sc.zoom ? sc.to - sc.from : 1,
+        move_from: sc.from,
+        easing: sc.easing || "ease_in_out_cubic",
+        caption: sc.caption === false ? "off" : "on"
       },
       manifest: { fps: { numerator: S.fps, denominator: 1 }, seed: 20261013, width: S.width, height: S.height, slots: { script: "auto", label: sc.label || "" } }
     };
@@ -36284,9 +36302,39 @@ If you want to offset all timestamps of a track such that the first one is zero,
     };
     const inst = Object.create(proto);
     inst.prepare(cs);
+    if (sc.shots) inst.fig.shots = sc.shots;
     const total = inst.fig.frames || null;
     if (total && sc.to > total) throw new StepError("settings.js の確認", `${sc.machine} は ${total} コマまでです（to=${sc.to}）`);
     return { sc, cs, inst, canvas, dom };
+  }
+  var addCalls = 0;
+  function loadMyMachine(file) {
+    return new Promise((resolve, reject) => {
+      if (!/^[A-Za-z0-9_-]+\.js$/.test(file)) {
+        reject(new StepError("settings.js の確認", `myMachines の "${file}" は tower.js のようなファイル名だけを書いてください`));
+        return;
+      }
+      const src = `./my-machines/${file}`;
+      let scriptError = null;
+      const before = addCalls;
+      const onError = (e) => {
+        scriptError = e.lineno && !/^Script error/.test(e.message) ? `${e.lineno} 行目: ${e.message}` : "文法の誤りがあります";
+      };
+      window.addEventListener("error", onError);
+      const el = document.createElement("script");
+      el.src = src;
+      const hint = "ファイルの書き方に誤りがあります。Chromeで ⌥⌘J を押すと、赤い行に場所が出ます";
+      el.onload = () => {
+        window.removeEventListener("error", onError);
+        if (scriptError || addCalls === before) reject(new StepError(`my-machines/${file} の読み込み`, `${scriptError ? scriptError + "。" : ""}${hint}`));
+        else resolve();
+      };
+      el.onerror = () => {
+        window.removeEventListener("error", onError);
+        reject(new StepError(`my-machines/${file} の読み込み`, "ファイルが見つかりません"));
+      };
+      document.head.appendChild(el);
+    });
   }
   async function drawOverlay(scene, W2, H) {
     const svg = scene.dom.querySelector("svg");
@@ -36329,6 +36377,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     }
     screen.width = S.width;
     screen.height = S.height;
+    screen.style.aspectRatio = `${S.width} / ${S.height}`;
     window.CS = { scene: null, registerScene(s) {
       this.scene = s;
     } };
@@ -36338,9 +36387,30 @@ If you want to offset all timestamps of a track such that the first one is zero,
       showStatus(new StepError("描画部品（engine/machines.js）の読み込み", e).message, true);
       return;
     }
+    const G32 = window.ISOGLOW3D;
+    window.addMachine = (id, make) => {
+      addCalls++;
+      G32.machines[id] = make;
+    };
+    try {
+      for (const file of S.myMachines || []) await loadMyMachine(file);
+      const known = Object.keys(G32.machines);
+      const missing = S.scenes.map((sc, i) => known.includes(sc.machine) ? null : `scenes の ${i + 1} 番目: machine "${sc.machine}" がありません。使えるのは ${known.join(" / ")} です`).filter(Boolean);
+      if (missing.length) throw new StepError("settings.js の確認", missing.join("\n"));
+    } catch (e) {
+      showStatus(e instanceof StepError ? e.message : new StepError("自作の機械の読み込み", e).message, true);
+      return;
+    }
     let scenes;
     try {
-      scenes = S.scenes.map((sc) => makeScene(window.CS.scene, S, sc, $("hidden")));
+      scenes = S.scenes.map((sc, i) => {
+        try {
+          return makeScene(window.CS.scene, S, sc, $("hidden"));
+        } catch (e) {
+          if (e instanceof StepError) throw e;
+          throw new StepError(`scenes の ${i + 1} 番目（${sc.machine}）の準備`, e);
+        }
+      });
     } catch (e) {
       showStatus(e instanceof StepError ? e.message : new StepError("機械の準備", e).message, true);
       return;
@@ -36373,16 +36443,19 @@ If you want to offset all timestamps of a track such that the first one is zero,
     async function show(g) {
       frame = g;
       busy = true;
+      let ok = true;
       try {
         await renderGlobal(g);
       } catch (e) {
         showStatus(e.message, true);
         playing = false;
+        ok = false;
       }
       busy = false;
       const { scene, local } = locate(g);
       seek.value = String(g);
       counter.textContent = `コマ ${g + 1} / ${total}（${(g / S.fps).toFixed(2)} 秒）${scene.sc.machine} ${local}`;
+      return ok;
     }
     let playing = false, startTs = 0, startFrame = 0;
     function tick(ts) {
@@ -36473,8 +36546,10 @@ If you want to offset all timestamps of a track such that the first one is zero,
       }
     };
     window.__vta = { total, renderGlobal, exportMp4, screen };
-    await show(0);
-    playBtn.disabled = seek.disabled = exportBtn.disabled = false;
+    const firstOk = await show(0);
+    playBtn.disabled = seek.disabled = false;
+    if (!firstOk) return;
+    exportBtn.disabled = false;
     showStatus(`準備ができました。${scenes.length} 場面・${total} コマ・${(total / S.fps).toFixed(2)} 秒`);
   }
   main().catch((e) => showStatus(new StepError("ページの準備", e).message, true));

@@ -964,7 +964,7 @@ CS.registerScene({
     this.C.finishBuild();
     const script = String(cs.slot('script')).trim(); this.setScript(script === 'auto' ? (this.fig.defaultScript || []) : JSON.parse(script));
     this.fps = cs.manifest.fps.numerator / cs.manifest.fps.denominator;
-    this.prm = {}; ['camera', 'orbit_deg', 'orbit_frames', 'zoom_start', 'zoom_end', 'zoom_frames'].forEach(k => { this.prm[k] = cs.param(k); }); this.ease = cs.ease[cs.param('easing')];
+    this.prm = {}; ['camera', 'orbit_deg', 'orbit_frames', 'zoom_start', 'zoom_end', 'zoom_frames', 'move_from'].forEach(k => { this.prm[k] = cs.param(k); }); this.ease = cs.ease[cs.param('easing')];
     this.touch = cs.param('touch') === 'on'; this.accent = cs.brand('color_accent');
     const root = cs.domRoot || document.getElementById('dom-stage'); root.textContent = '';
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); this.svg.setAttribute('id', 'ig3-touch'); this.svg.setAttribute('viewBox', `0 0 ${Wd} ${Hd}`); this.svg.setAttribute('preserveAspectRatio', 'none'); root.appendChild(this.svg);
@@ -978,8 +978,8 @@ CS.registerScene({
     // camera: 全景の view（target・方向 (1,1,1)・距離 dist × max(1, 1.45/aspect)）に shot の target / zoom / orbit を重ね、parameter の orbit / zoom を掛ける
     const aspect = C.width / C.height, dist0 = F.view.dist * Math.max(1, 1.45 / aspect), mode = this.prm.camera;
     const pose = mode === 'shots' && F.shots && F.shots.length ? G3.Shots.poseAt(frame, F.shots, this.ease) : { target: F.view.target, zoom: 1, orbit: 0 };
-    const tz = this.ease(Math.min(1, frame / Math.max(1, this.prm.zoom_frames))), zoom = pose.zoom * (this.prm.zoom_start + (this.prm.zoom_end - this.prm.zoom_start) * tz);
-    const to = this.ease(Math.min(1, frame / Math.max(1, this.prm.orbit_frames))), ang = THREE.MathUtils.degToRad(this.prm.orbit_deg * to + (pose.orbit || 0));
+    const tz = this.ease(Math.min(1, Math.max(0, frame - this.prm.move_from) / Math.max(1, this.prm.zoom_frames))), zoom = pose.zoom * (this.prm.zoom_start + (this.prm.zoom_end - this.prm.zoom_start) * tz);
+    const to = this.ease(Math.min(1, Math.max(0, frame - this.prm.move_from) / Math.max(1, this.prm.orbit_frames))), ang = THREE.MathUtils.degToRad(this.prm.orbit_deg * to + (pose.orbit || 0));
     const dir = new THREE.Vector3(1, 1, 1).normalize().applyAxisAngle(new THREE.Vector3(0, 1, 0), ang);
     const target = pose.target.isVector3 ? pose.target.clone() : W(...pose.target);
     const cam = mode === 'iso' ? C.ortho : C.persp, dist = dist0 / zoom; cam.position.copy(target).addScaledVector(dir, dist); cam.lookAt(target);

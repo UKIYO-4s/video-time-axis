@@ -3,7 +3,8 @@
 import { Muxer, ArrayBufferTarget } from '../vendor/mp4-muxer/mp4-muxer.mjs';
 
 const FONT = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
-const MACHINES = ['camera', 'phone', 'projector'];
+const BUILT_IN = ['camera', 'phone', 'projector'];
+const CAMERAS = ['shots', 'overview', 'iso'];
 const EASE = {
   linear: t => t,
   ease_in_quad: t => t * t,
@@ -35,9 +36,26 @@ function checkSettings(S) {
   if (!(S.width > 0 && S.width % 2 === 0 && S.height > 0 && S.height % 2 === 0)) problems.push('width と height は偶数にしてください');
   (S.scenes || []).forEach((sc, i) => {
     const n = `scenes の ${i + 1} 番目`;
-    if (!MACHINES.includes(sc.machine)) problems.push(`${n}: machine は ${MACHINES.join(' / ')} のどれかにしてください（いまは "${sc.machine}"）`);
+    if (typeof sc.machine !== 'string' || !sc.machine) problems.push(`${n}: machine に機械の名前を書いてください`);
     if (!(Number.isInteger(sc.from) && Number.isInteger(sc.to) && sc.from >= 0 && sc.to > sc.from)) problems.push(`${n}: from と to は整数で、to を from より大きくしてください`);
     if (!/^#[0-9a-fA-F]{6}$/.test(sc.accent || '')) problems.push(`${n}: accent は #22d3ee のような6桁の色コードにしてください`);
+    // カメラと演出（書かなければ、機械の標準の動きになる）
+    if (sc.camera != null && !CAMERAS.includes(sc.camera)) problems.push(`${n}: camera は ${CAMERAS.join(' / ')} のどれかにしてください（いまは "${sc.camera}"）`);
+    if (sc.orbit != null && !Number.isFinite(sc.orbit)) problems.push(`${n}: orbit は回り込む角度を数字で書いてください（例: 45）`);
+    if (sc.zoom != null && !(Array.isArray(sc.zoom) && sc.zoom.length === 2 && sc.zoom.every(v => v > 0))) problems.push(`${n}: zoom は [始まりの倍率, 終わりの倍率] で書いてください（例: [1, 1.8]）`);
+    if (sc.easing != null && !EASE[sc.easing]) problems.push(`${n}: easing は ${Object.keys(EASE).join(' / ')} のどれかにしてください`);
+    if (sc.theme != null && !['dark', 'light'].includes(sc.theme)) problems.push(`${n}: theme は dark / light のどちらかにしてください`);
+    if (sc.touch != null && typeof sc.touch !== 'boolean') problems.push(`${n}: touch は true / false で書いてください`);
+    if (sc.caption != null && typeof sc.caption !== 'boolean') problems.push(`${n}: caption は true / false で書いてください`);
+    if (sc.script != null && !Array.isArray(sc.script)) problems.push(`${n}: script は [{ frame: 30, type: 'click', target: '名前' }] のような並びで書いてください`);
+    if (sc.shots != null) {
+      if (!Array.isArray(sc.shots) || !sc.shots.length) problems.push(`${n}: shots は1つ以上のカットの並びで書いてください`);
+      else sc.shots.forEach((sh, j) => {
+        if (!(Number.isInteger(sh.from) && sh.from >= 0) || (j === 0 && sh.from !== 0) || (j > 0 && sh.from <= sc.shots[j - 1].from)) problems.push(`${n}: shots の ${j + 1} 番目: from は0から始まる昇順の整数にしてください`);
+        if (!(Array.isArray(sh.target) && sh.target.length === 3 && sh.target.every(Number.isFinite))) problems.push(`${n}: shots の ${j + 1} 番目: target は [x, y, z] で書いてください`);
+        if (!(sh.zoom > 0)) problems.push(`${n}: shots の ${j + 1} 番目: zoom は0より大きい数にしてください`);
+      });
+    }
   });
   if (problems.length) throw new StepError('settings.js の確認', problems.join('\n'));
 }
@@ -47,20 +65,45 @@ function makeScene(proto, S, sc, box) {
   const canvas = document.createElement('canvas'); canvas.width = S.width; canvas.height = S.height;
   const dom = document.createElement('div');
   box.append(canvas, dom);
+  const zoom = sc.zoom || [1, 1];
   const cfg = {
-    slots: { script: 'auto', label: sc.label || sc.machine.toUpperCase() },
+    slots: { script: sc.script ? JSON.stringify(sc.script) : 'auto', label: sc.label || sc.machine.toUpperCase() },
     brand: { color_bg: '#121314', color_accent: sc.accent, color_text: '#e6e8e9', color_muted: '#4f5357', font_family: FONT },
-    parameters: { machine: sc.machine, theme: 'dark', camera: 'shots', material: 'line', touch: 'on', orbit_deg: 0, orbit_frames: 1,
-      zoom_start: 1, zoom_end: 1, zoom_frames: 1, easing: 'ease_in_out_cubic', caption: 'on' },
+    parameters: { machine: sc.machine, theme: sc.theme || 'dark', camera: sc.camera || 'shots', material: 'line', touch: sc.touch === false ? 'off' : 'on',
+      orbit_deg: sc.orbit || 0, orbit_frames: sc.orbit ? sc.to - sc.from : 1,
+      zoom_start: zoom[0], zoom_end: zoom[1], zoom_frames: sc.zoom ? sc.to - sc.from : 1, move_from: sc.from,
+      easing: sc.easing || 'ease_in_out_cubic', caption: sc.caption === false ? 'off' : 'on' },
     manifest: { fps: { numerator: S.fps, denominator: 1 }, seed: 20261013, width: S.width, height: S.height, slots: { script: 'auto', label: sc.label || '' } },
   };
   const cs = { canvas, domRoot: dom, manifest: cfg.manifest, ease: EASE,
     slot: n => cfg.slots[n], brand: n => cfg.brand[n], param: n => cfg.parameters[n] };
   const inst = Object.create(proto);
   inst.prepare(cs);
+  if (sc.shots) inst.fig.shots = sc.shots;
   const total = inst.fig.frames || null;
   if (total && sc.to > total) throw new StepError('settings.js の確認', `${sc.machine} は ${total} コマまでです（to=${sc.to}）`);
   return { sc, cs, inst, canvas, dom };
+}
+
+// ---- 読者が作った機械（my-machines/ のファイル）を順に読み込む ----
+let addCalls = 0;
+function loadMyMachine(file) {
+  return new Promise((resolve, reject) => {
+    if (!/^[A-Za-z0-9_-]+\.js$/.test(file)) { reject(new StepError('settings.js の確認', `myMachines の "${file}" は tower.js のようなファイル名だけを書いてください`)); return; }
+    // ファイルを直接開くと、Chromeは文法エラーの詳細を隠すことがある。そのため「登録されたか」でも確かめる
+    const src = `./my-machines/${file}`; let scriptError = null; const before = addCalls;
+    const onError = e => { scriptError = e.lineno && !/^Script error/.test(e.message) ? `${e.lineno} 行目: ${e.message}` : '文法の誤りがあります'; };
+    window.addEventListener('error', onError);
+    const el = document.createElement('script'); el.src = src;
+    const hint = 'ファイルの書き方に誤りがあります。Chromeで ⌥⌘J を押すと、赤い行に場所が出ます';
+    el.onload = () => {
+      window.removeEventListener('error', onError);
+      if (scriptError || addCalls === before) reject(new StepError(`my-machines/${file} の読み込み`, `${scriptError ? scriptError + '。' : ''}${hint}`));
+      else resolve();
+    };
+    el.onerror = () => { window.removeEventListener('error', onError); reject(new StepError(`my-machines/${file} の読み込み`, 'ファイルが見つかりません')); };
+    document.head.appendChild(el);
+  });
 }
 
 // ---- 字幕と指の演出を、絵の上に重ねる（書き出しにも同じものが入る） ----
@@ -91,6 +134,7 @@ async function main() {
   const S = window.SETTINGS;
   try { checkSettings(S); } catch (e) { showStatus(e.message, true); return; }
   screen.width = S.width; screen.height = S.height;
+  screen.style.aspectRatio = `${S.width} / ${S.height}`;
 
   // 機械の描画部品を読み込む（machines.js は CS.registerScene で自分を登録する）
   window.CS = { scene: null, registerScene(s) { this.scene = s; } };
@@ -98,8 +142,18 @@ async function main() {
     showStatus(new StepError('描画部品（engine/machines.js）の読み込み', e).message, true); return;
   }
 
+  // 読者の機械を読み込み、settings.js が指定した機械がそろっているか確かめる
+  const G3 = window.ISOGLOW3D;
+  window.addMachine = (id, make) => { addCalls++; G3.machines[id] = make; };
+  try {
+    for (const file of S.myMachines || []) await loadMyMachine(file);
+    const known = Object.keys(G3.machines);
+    const missing = S.scenes.map((sc, i) => (known.includes(sc.machine) ? null : `scenes の ${i + 1} 番目: machine "${sc.machine}" がありません。使えるのは ${known.join(' / ')} です`)).filter(Boolean);
+    if (missing.length) throw new StepError('settings.js の確認', missing.join('\n'));
+  } catch (e) { showStatus(e instanceof StepError ? e.message : new StepError('自作の機械の読み込み', e).message, true); return; }
+
   let scenes;
-  try { scenes = S.scenes.map(sc => makeScene(window.CS.scene, S, sc, $('hidden'))); }
+  try { scenes = S.scenes.map((sc, i) => { try { return makeScene(window.CS.scene, S, sc, $('hidden')); } catch (e) { if (e instanceof StepError) throw e; throw new StepError(`scenes の ${i + 1} 番目（${sc.machine}）の準備`, e); } }); }
   catch (e) { showStatus(e instanceof StepError ? e.message : new StepError('機械の準備', e).message, true); return; }
 
   // 通しのコマ番号 g → どの場面の何コマ目か
@@ -119,12 +173,13 @@ async function main() {
   seek.max = String(total - 1);
   let frame = 0;
   async function show(g) {
-    frame = g; busy = true;
-    try { await renderGlobal(g); } catch (e) { showStatus(e.message, true); playing = false; }
+    frame = g; busy = true; let ok = true;
+    try { await renderGlobal(g); } catch (e) { showStatus(e.message, true); playing = false; ok = false; }
     busy = false;
     const { scene, local } = locate(g);
     seek.value = String(g);
     counter.textContent = `コマ ${g + 1} / ${total}（${(g / S.fps).toFixed(2)} 秒）${scene.sc.machine} ${local}`;
+    return ok;
   }
 
   // 再生: 1秒に fps コマずつ進める。描画が間に合わないときはコマを飛ばさず遅れる
@@ -190,8 +245,10 @@ async function main() {
   // 検証用の入口（ページの見た目には影響しない）
   window.__vta = { total, renderGlobal, exportMp4, screen };
 
-  await show(0);
-  playBtn.disabled = seek.disabled = exportBtn.disabled = false;
+  const firstOk = await show(0);
+  playBtn.disabled = seek.disabled = false;
+  if (!firstOk) return;   // 最初のコマで失敗したら、赤いメッセージを残す
+  exportBtn.disabled = false;
   showStatus(`準備ができました。${scenes.length} 場面・${total} コマ・${(total / S.fps).toFixed(2)} 秒`);
 }
 
