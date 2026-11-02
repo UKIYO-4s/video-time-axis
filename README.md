@@ -41,3 +41,4 @@ ffmpeg・Node.js などのインストールはいりません。
 - 3D表示は [three.js](https://threejs.org/) r160（MIT、`licenses/three.js-LICENSE.txt`）。
 - MP4の書き出しは [mp4-muxer](https://github.com/Vanilagy/mp4-muxer) 5.2.2（Vanilagy、MIT、`licenses/mp4-muxer-LICENSE.txt`）。npm の公開物をそのまま同梱しています（integrity `sha512-dhozjTywI0h2qFzeShagt8YYw811fh1XlwiDCE2f6Aeqf6xG2CyuShoSa5E0AZDO8pPF0JOZ3wOmWBNWIGdSpQ==`）。
 - 機械の形・動き・台本・カメラワーク・このページは、クリエイターズジャパンの Shoei が作成しました。実在の機種の写真やロゴは使っていません。
+- 上記以外の部分（機械の形・動き・台本・カメラワーク・このページ）のライセンスは MIT です（`LICENSE`）。改造も、作った動画の利用も自由です。
