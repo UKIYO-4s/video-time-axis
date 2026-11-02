@@ -95,8 +95,7 @@ async function main() {
   // 機械の描画部品を読み込む（machines.js は CS.registerScene で自分を登録する）
   window.CS = { scene: null, registerScene(s) { this.scene = s; } };
   try { await import('./machines.js'); } catch (e) {
-    showStatus(new StepError('描画部品（engine/machines.js）の読み込み', e).message +
-      '\nファイルを直接開いている場合は、START_HERE.md の「開き方」を確認してください。', true); return;
+    showStatus(new StepError('描画部品（engine/machines.js）の読み込み', e).message, true); return;
   }
 
   let scenes;

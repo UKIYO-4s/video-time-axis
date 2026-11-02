@@ -24,9 +24,6 @@
   footer { margin-top: 32px; font-size: 12px; color: var(--muted); line-height: 1.7; }
   footer a { color: var(--muted); }
 </style>
-<script type="importmap">
-{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/jsm/" } }
-</script>
 <script src="./settings.js"></script>
 </head>
 <body>
@@ -48,6 +45,6 @@
     描画の土台は <a href="https://iso-glow.vercel.app">iso-glow</a>（April Zhu・MIT）と three.js（MIT）、MP4の書き出しは mp4-muxer（Vanilagy・MIT）を使っています。ライセンス文は licenses フォルダにあります。
   </footer>
 </main>
-<script type="module" src="./engine/player.js"></script>
+<script src="./engine/app.bundle.js"></script>
 </body>
 </html>

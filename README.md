@@ -13,13 +13,13 @@
 
 > デスクトップの video-time-axis フォルダにある START_HERE.md を読んで、書いてあるとおりに進めて
 
-あとは、ChatGPTが Chrome でページを開き、書き出しと設定の変更を手伝います。手順の中身は [START_HERE.md](START_HERE.md) にあります。
+動画を見るだけなら、ChatGPTは不要です。`index.html` をChromeで開くと、再生とMP4の書き出しができます。設定の変更はChatGPTが手伝います。手順の中身は [START_HERE.md](START_HERE.md) にあります。
 
 ## 必要なもの
 
 - Mac
 - Google Chrome
-- ChatGPT のMacアプリ（設定を変えるときに使う。開いて書き出すだけなら、START_HERE.md の「1. 動画を開く」のコマンドを自分で実行しても同じ）
+- ChatGPT のMacアプリ（設定を変えるときに使う）
 
 ffmpeg・Node.js などのインストールはいりません。
 
@@ -30,6 +30,7 @@ ffmpeg・Node.js などのインストールはいりません。
 | `index.html` | 再生・コマ送り・MP4書き出しのページ |
 | `settings.js` | 機械の順番・色・長さの設定。**変えてよいのはこのファイルだけ** |
 | `START_HERE.md` | ChatGPTアプリへの手順書 |
+| `engine/app.bundle.js` | ページが実際に読み込むファイル。下の2つと `vendor/` を1つにまとめた生成物（esbuild 0.27.7） |
 | `engine/player.js` | 場面をつないで描き、MP4にする処理 |
 | `engine/machines.js` | 3台の機械の形と動き（下の出典を参照） |
 | `vendor/` | 外部のライブラリ（three.js・mp4-muxer）。中身は変更していません |

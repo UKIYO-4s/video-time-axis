@@ -23,16 +23,13 @@
 
 ## 1. 動画を開く
 
-1. 読者のMacに Google Chrome があるか確認します（`/Applications/Google Chrome.app`）。なければ、https://www.google.com/chrome/ から入れるよう案内してください。
-2. このフォルダで、次のコマンドを実行します。Chromeが、このページ専用の設定で開きます（ふだん使っているChromeの設定や履歴には触れません）。
+Chromeは、読者が自分で開きます。あなた（ChatGPT）がコマンドで起動する必要はありません。
 
-```sh
-open -na "Google Chrome" --args --allow-file-access-from-files --no-first-run --no-default-browser-check --user-data-dir="$TMPDIR/video-time-axis-chrome" "file://$PWD/index.html"
-```
-
-3. ページの下に「準備ができました。3 場面・180 コマ・6.00 秒」と出れば成功です。読者に「再生」を押してもらいます。
-
-**開き方の補足**: ファイルをダブルクリックして普通に開くと、ブラウザの安全のための制限で、絵が出ません（「描画部品の読み込みで失敗しました」と出ます）。必ず上のコマンドで開いてください。
+1. 読者に、次の操作を案内してください。
+   - Finderで、このフォルダの `index.html` をダブルクリックする
+   - Chrome以外で開いたときは、`index.html` を右クリックし、「このアプリケーションで開く」から「Google Chrome」を選ぶ
+   - Chromeが入っていなければ、https://www.google.com/chrome/ から入れる
+2. ページの下に「準備ができました。3 場面・180 コマ・6.00 秒」と出れば成功です。読者に「再生」を押してもらいます。
 
 ## 2. MP4で書き出す
 
@@ -80,7 +77,7 @@ open -na "Google Chrome" --args --allow-file-access-from-files --no-first-run --
 
 | ページの表示 | 原因と対処 |
 |---|---|
-| 描画部品の読み込みで失敗しました | ダブルクリックで開いている。1の手順のコマンドで開き直す |
+| 描画部品の読み込みで失敗しました | フォルダの中身が欠けている可能性がある。ZIPをダウンロードし直して解凍する |
 | settings.js の確認で失敗しました | 書き換えた値の誤り。メッセージに何番目のどの値かが出るので、そこだけ直す |
 | 書き出しの準備で失敗しました | Chrome以外のブラウザで開いている。Chromeで開く |
 | 何も表示されない | Chromeの「表示 → 開発 / 管理 → デベロッパーツール」の Console に `[video-time-axis]` で始まる行があれば、それを読者に伝える |
