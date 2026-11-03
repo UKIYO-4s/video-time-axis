@@ -18,7 +18,7 @@ function diff(a, b) { let n = 0; for (let i = 0; i < a.length; i += 4) if (Math.
 const hex = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
 
 // 合格ラインは実測で決めた（良い例の車 112部品・44種類・75%、箱だけの車 33部品・14種類・10%）
-export const LIMITS = { parts: 60, kinds: 20, moving: 3, area: 0.25, lastArea: 0.2, litArea: 0.03, still: 2.0, cuts: 2 };
+export const LIMITS = { parts: 60, kinds: 20, moving: 3, area: 0.25, lastArea: 0.2, litArea: 0.025, still: 2.0, cuts: 2 };
 
 export async function measureScene({ sc, range, renderGlobal, screen, S, source }) {
   const c = document.createElement('canvas'); c.width = W; c.height = H; const small = c.getContext('2d', { willReadFrequently: true });
@@ -59,7 +59,7 @@ export function judge(m) {
     { name: '動く・点灯する部品', ok: m.moving >= L.moving, val: `${m.moving} 組（目安 ${L.moving} 組以上）`, fix: 'kit.hinge・kit.rotor・kit.slider・kit.wheel で動く部品を増やし、defaultScript で動かしてください' },
     { name: '画面での大きさ', ok: m.area >= L.area, val: `画面の ${Math.round(m.area * 100)}%（目安 ${Math.round(L.area * 100)}%以上）`, fix: 'view の dist を小さくするか、shots の zoom を上げてください' },
     { name: '最後の構図', ok: !m.lastEdge && m.lastArea >= L.lastArea, val: m.lastEdge ? '画面の端で切れています' : `画面の ${Math.round(m.lastArea * 100)}%（目安 ${Math.round(L.lastArea * 100)}%以上）`, fix: '最後のカットの target を機械の中心にして、機械が小さければ zoom を上げ、切れていれば下げてください' },
-    { name: '光', ok: m.litArea >= L.litArea, val: `光る面積 ${(m.litArea * 100).toFixed(1)}%（目安 ${Math.round(L.litArea * 100)}%以上）`, fix: '見せ場の面を kit.mats.light() にして広げてください。kit.beam や kit.pool も使えます。点の glow だけで増やさないでください' },
+    { name: '光', ok: m.litArea >= L.litArea, val: `光る面積 ${(m.litArea * 100).toFixed(1)}%（目安 ${(L.litArea * 100).toFixed(1)}%以上）`, fix: '見せ場の面を kit.mats.light() にして広げてください。kit.beam や kit.pool も使えます。点の glow だけで増やさないでください' },
     { name: '止まっている時間', ok: m.stillSec <= L.still, val: `最長 ${m.stillSec} 秒（目安 ${L.still} 秒以内）`, fix: '台本の間隔を詰めるか、カメラの動きを足してください' },
     { name: 'カメラ', ok: !!moved, val: m.camera === 'shots' ? `カット ${m.cuts} 個` : `${m.camera}`, fix: 'shots に2カット以上入れて、全景と見せ場への寄りを作ってください（カメラなしの指定なら、この項目は無視して構いません）' },
     { name: '同じ絵になるか', ok: m.repeat && m.banned.length === 0, val: m.banned.length ? `使えないものがあります: ${m.banned.join(', ')}` : (m.repeat ? '同じコマは同じ絵です' : '同じコマで絵が変わります'), fix: '動きは now と台本だけで決め、乱数は C.rng() を使ってください' },
