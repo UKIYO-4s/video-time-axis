@@ -1,14 +1,14 @@
 // 動画の設定。機械の順番・色・長さ・カメラは、ここで変えます。
-// 新しい機械（ビルなど）を増やすときは、my-machines/ にファイルを足して myMachines に書きます。
+// 新しい機械（車など）を増やすときは、my-machines/ にファイルを足して myMachines に書きます。
 // 動画は「場面」を上から順につないだものです。1場面 = 1台の機械。
 //
-// machine : 機械の種類（camera / phone / projector / tower、または my-machines/ で作った機械）
+// machine : 機械の種類（camera / phone / projector、または my-machines/ で作った機械）
 // from    : その機械の動きの、何コマ目から使うか（30コマ = 1秒）
 // to      : 何コマ目の手前まで使うか（from=150, to=210 なら 60コマ = 2秒）
 // accent  : 光る色（#から始まる6桁の色コード）
 // label   : 左下に出る名前
 //
-// 機械ごとの長さ: camera 240コマ（8秒）/ phone 270コマ（9秒）/ projector 240コマ（8秒）/ tower 240コマ（8秒）
+// 機械ごとの長さ: camera 240コマ（8秒）/ phone 270コマ（9秒）/ projector 240コマ（8秒）
 //
 // カメラと演出（各場面に足せます。書かなければ、機械の標準の動きになります）
 // camera  : 'shots'（カット割りで動く）/ 'overview'（全景で固定）/ 'iso'（遠近のない図面のような見え方）
@@ -28,7 +28,7 @@ window.SETTINGS = {
   width: 1200,    // 横のピクセル数（偶数）
   height: 900,    // 縦のピクセル数（偶数）。縦動画なら width: 1080, height: 1920
   fileName: 'video-time-axis.mp4',
-  myMachines: ['tower.js'],   // my-machines/ から読み込む自作の機械
+  myMachines: [],   // my-machines/ から読み込む自作の機械
   scenes: [
     { machine: 'camera',    from: 150, to: 210, accent: '#22d3ee', label: 'DIGITAL CAMERA' },
     { machine: 'phone',     from: 105, to: 165, accent: '#ff9a2e', label: 'ROTARY PHONE' },

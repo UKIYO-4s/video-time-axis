@@ -29,7 +29,10 @@ ffmpeg・Node.js などのインストールはいりません。
 |---|---|
 | `index.html` | 再生・コマ送り・MP4書き出しのページ |
 | `settings.js` | 機械の順番・色・長さ・カメラワークの設定 |
-| `my-machines/` | 自分で作る機械の置き場。`tower.js` は書き方の見本 |
+| `my-machines/` | 自分で作る機械の置き場 |
+| `examples/` | 作り方の手本（車・ビル） |
+| `engine/kit.js` | 部品キット（ドア、タイヤ、光など） |
+| `engine/quality.js` | 自作の機械の品質チェック |
 | `reference/iso-glow/` | 元になった iso-glow の説明書と手本（MIT、変更なし） |
 | `START_HERE.md` | ChatGPTアプリへの手順書 |
 | `engine/app.bundle.js` | ページが実際に読み込むファイル。下の2つと `vendor/` を1つにまとめた生成物（esbuild 0.27.7） |

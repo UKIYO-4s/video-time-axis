@@ -1,6 +1,8 @@
 // 再生と書き出し。settings.js の場面を順につなぎ、通しのコマ番号 g から1枚の絵を描く。
 // 描き方は「コマ番号 → 絵」の決まった計算だけ。乱数や現在時刻は使わない。
 import { Muxer, ArrayBufferTarget } from '../vendor/mp4-muxer/mp4-muxer.mjs';
+import { makeKit } from './kit.js';
+import { runQuality, formatQuality } from './quality.js';
 
 const FONT = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
 const BUILT_IN = ['camera', 'phone', 'projector'];
@@ -86,7 +88,7 @@ function makeScene(proto, S, sc, box) {
 }
 
 // ---- 読者が作った機械（my-machines/ のファイル）を順に読み込む ----
-let addCalls = 0;
+let addCalls = 0; const userMade = new Set();
 function loadMyMachine(file) {
   return new Promise((resolve, reject) => {
     if (!/^[A-Za-z0-9_-]+\.js$/.test(file)) { reject(new StepError('settings.js の確認', `myMachines の "${file}" は tower.js のようなファイル名だけを書いてください`)); return; }
@@ -144,7 +146,7 @@ async function main() {
 
   // 読者の機械を読み込み、settings.js が指定した機械がそろっているか確かめる
   const G3 = window.ISOGLOW3D;
-  window.addMachine = (id, make) => { addCalls++; G3.machines[id] = make; };
+  window.addMachine = (id, make) => { addCalls++; G3.machines[id] = (C, opts) => { Object.defineProperty(C, 'kit', { configurable: true, get() { const k = makeKit(C); Object.defineProperty(C, 'kit', { value: k }); return k; } }); return make(C, opts); }; G3.machines[id].source = String(make); userMade.add(id); };
   try {
     for (const file of S.myMachines || []) await loadMyMachine(file);
     const known = Object.keys(G3.machines);
@@ -242,14 +244,28 @@ async function main() {
     }
   };
 
-  // 検証用の入口（ページの見た目には影響しない）
-  window.__vta = { total, renderGlobal, exportMp4, screen };
+  // 品質チェック: 自作の機械がある場面だけ自動で測る。結果はページに表示し、コピーしてChatGPTに渡せる
+  const quality = async () => {
+    const list = scenes.map((sc, i) => ({ sc, i })).filter(x => userMade.has(x.sc.sc.machine));
+    return runQuality({ list, ranges, renderGlobal, ctx, screen, S, source: id => G3.machines[id].source });
+  };
+  window.__vta = { total, renderGlobal, exportMp4, screen, quality, scenes, ranges };
 
   const firstOk = await show(0);
   playBtn.disabled = seek.disabled = false;
   if (!firstOk) return;   // 最初のコマで失敗したら、赤いメッセージを残す
   exportBtn.disabled = false;
   showStatus(`準備ができました。${scenes.length} 場面・${total} コマ・${(total / S.fps).toFixed(2)} 秒`);
+  if (S.scenes.some(sc => userMade.has(sc.machine))) {
+    const box = $('quality'), out = $('quality-text'), copy = $('quality-copy');
+    box.hidden = false; out.textContent = '品質チェック中…';
+    playBtn.disabled = seek.disabled = exportBtn.disabled = true;
+    try { const r = await quality(); out.textContent = formatQuality(r); box.classList.toggle('ng', !r.ok); }
+    catch (e) { out.textContent = new StepError('品質チェック', e).message; box.classList.add('ng'); }
+    playBtn.disabled = seek.disabled = exportBtn.disabled = false;
+    copy.onclick = async () => { try { await navigator.clipboard.writeText(out.textContent); copy.textContent = 'コピーしました'; } catch (_) { const r = document.createRange(); r.selectNodeContents(out); getSelection().removeAllRanges(); getSelection().addRange(r); copy.textContent = '選択しました。⌘Cでコピー'; } };
+    await show(0);
+  }
 }
 
 main().catch(e => showStatus(new StepError('ページの準備', e).message, true));

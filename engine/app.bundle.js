@@ -1,4 +1,4 @@
-/* engine/app.bundle.js（生成物。直接編集しない）engine/player.js・engine/machines.js・vendor/ を1つにまとめたもの。ライセンスは LICENSE と licenses/ を参照。 */
+/* engine/app.bundle.js（生成物。直接編集しない）engine/player.js・engine/kit.js・engine/quality.js・engine/machines.js・vendor/ を1つにまとめたもの。ライセンスは LICENSE と licenses/ を参照。 */
 (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -13381,11 +13381,11 @@
           this.b = scalar;
           return this;
         }
-        setHex(hex, colorSpace = SRGBColorSpace) {
-          hex = Math.floor(hex);
-          this.r = (hex >> 16 & 255) / 255;
-          this.g = (hex >> 8 & 255) / 255;
-          this.b = (hex & 255) / 255;
+        setHex(hex2, colorSpace = SRGBColorSpace) {
+          hex2 = Math.floor(hex2);
+          this.r = (hex2 >> 16 & 255) / 255;
+          this.g = (hex2 >> 8 & 255) / 255;
+          this.b = (hex2 & 255) / 255;
           ColorManagement.toWorkingColorSpace(this, colorSpace);
           return this;
         }
@@ -13462,17 +13462,17 @@
                 console.warn("THREE.Color: Unknown color model " + style);
             }
           } else if (m = /^\#([A-Fa-f\d]+)$/.exec(style)) {
-            const hex = m[1];
-            const size = hex.length;
+            const hex2 = m[1];
+            const size = hex2.length;
             if (size === 3) {
               return this.setRGB(
-                parseInt(hex.charAt(0), 16) / 15,
-                parseInt(hex.charAt(1), 16) / 15,
-                parseInt(hex.charAt(2), 16) / 15,
+                parseInt(hex2.charAt(0), 16) / 15,
+                parseInt(hex2.charAt(1), 16) / 15,
+                parseInt(hex2.charAt(2), 16) / 15,
                 colorSpace
               );
             } else if (size === 6) {
-              return this.setHex(parseInt(hex, 16), colorSpace);
+              return this.setHex(parseInt(hex2, 16), colorSpace);
             } else {
               console.warn("THREE.Color: Invalid hex color " + style);
             }
@@ -13482,9 +13482,9 @@
           return this;
         }
         setColorName(style, colorSpace = SRGBColorSpace) {
-          const hex = _colorKeywords[style.toLowerCase()];
-          if (hex !== void 0) {
-            this.setHex(hex, colorSpace);
+          const hex2 = _colorKeywords[style.toLowerCase()];
+          if (hex2 !== void 0) {
+            this.setHex(hex2, colorSpace);
           } else {
             console.warn("THREE.Color: Unknown color " + style);
           }
@@ -21961,10 +21961,10 @@
           let i = 0;
           while (i < curveLengths.length) {
             if (curveLengths[i] >= d) {
-              const diff = curveLengths[i] - d;
+              const diff2 = curveLengths[i] - d;
               const curve = this.curves[i];
               const segmentLength = curve.getLength();
-              const u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
+              const u = segmentLength === 0 ? 0 : 1 - diff2 / segmentLength;
               return curve.getPointAt(u, optionalTarget);
             }
             i++;
@@ -27546,18 +27546,18 @@
           return this.elapsedTime;
         }
         getDelta() {
-          let diff = 0;
+          let diff2 = 0;
           if (this.autoStart && !this.running) {
             this.start();
             return 0;
           }
           if (this.running) {
             const newTime = now();
-            diff = (newTime - this.oldTime) / 1e3;
+            diff2 = (newTime - this.oldTime) / 1e3;
             this.oldTime = newTime;
-            this.elapsedTime += diff;
+            this.elapsedTime += diff2;
           }
-          return diff;
+          return diff2;
         }
       };
       _position$1 = /* @__PURE__ */ new Vector3();
@@ -30334,8 +30334,8 @@
         }
       };
       PlaneHelper = class extends Line {
-        constructor(plane, size = 1, hex = 16776960) {
-          const color = hex;
+        constructor(plane, size = 1, hex2 = 16776960) {
+          const color = hex2;
           const positions = [1, -1, 0, -1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0];
           const geometry = new BufferGeometry();
           geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
@@ -32238,10 +32238,10 @@
       g.scale(TS, TS, TS);
       const m = new Mesh(g, recessMat);
       parent.add(m);
-      parent.add(loopL(sh.getPoints(12).map((p) => W(p.x, -p.y, z + 0.06)), lineMat));
+      parent.add(loopL(sh.getPoints(12).map((p) => W2(p.x, -p.y, z + 0.06)), lineMat));
       return m;
     }
-    const seg = (arr, parent, mat = lineMat) => parent.add(fat(arr.flatMap(([a, b]) => [...W(...a).toArray(), ...W(...b).toArray()]), mat));
+    const seg = (arr, parent, mat = lineMat) => parent.add(fat(arr.flatMap(([a, b]) => [...W2(...a).toArray(), ...W2(...b).toArray()]), mat));
     function faceCanvas(kind, x, y, z, w, h, P, parent, transparent = false) {
       const c = document.createElement("canvas");
       c.width = Math.round(w * P);
@@ -32252,9 +32252,9 @@
       const m = new Mesh(new PlaneGeometry(w * TS, h * TS), new MeshBasicMaterial({ map: tex, toneMapped: false, transparent, depthWrite: !transparent, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -12 }));
       if (kind === "top") {
         m.rotation.x = -Math.PI / 2;
-        m.position.copy(W(x + w / 2, y + h / 2, z + 0.15));
+        m.position.copy(W2(x + w / 2, y + h / 2, z + 0.15));
       } else {
-        m.position.copy(W(x + w / 2, y + 0.3, z - h / 2));
+        m.position.copy(W2(x + w / 2, y + 0.3, z - h / 2));
       }
       parent.add(m);
       return { c, x: c.getContext("2d"), tex, P, mesh: m };
@@ -32265,9 +32265,9 @@
       const g = new ShapeGeometry(sh, 12);
       g.scale(TS, TS, TS);
       const m = new Mesh(g, recessMat);
-      m.position.copy(W(x, y + 0.06, ztop - h));
+      m.position.copy(W2(x, y + 0.06, ztop - h));
       parent.add(m);
-      parent.add(loopL(sh.getPoints(12).map((p) => W(x + p.x, y + 0.07, ztop - h + p.y)), lineMat));
+      parent.add(loopL(sh.getPoints(12).map((p) => W2(x + p.x, y + 0.07, ztop - h + p.y)), lineMat));
       return m;
     }
     function sideInset(parent, x, yRight, ztop, w, h, r) {
@@ -32277,14 +32277,14 @@
       g.scale(TS, TS, TS);
       const m = new Mesh(g, recessMat);
       m.rotation.y = Math.PI / 2;
-      m.position.copy(W(x + 0.06, yRight, ztop - h));
+      m.position.copy(W2(x + 0.06, yRight, ztop - h));
       parent.add(m);
-      parent.add(loopL(sh.getPoints(12).map((p) => W(x + 0.07, yRight - p.x, ztop - h + p.y)), lineMat));
+      parent.add(loopL(sh.getPoints(12).map((p) => W2(x + 0.07, yRight - p.x, ztop - h + p.y)), lineMat));
       return m;
     }
     const polyLine = (pts, mat, parent) => {
       const out = [];
-      for (let i = 0; i < pts.length - 1; i++) out.push(...W(...pts[i]).toArray(), ...W(...pts[i + 1]).toArray());
+      for (let i = 0; i < pts.length - 1; i++) out.push(...W2(...pts[i]).toArray(), ...W2(...pts[i + 1]).toArray());
       const l = fat(out, mat);
       parent.add(l);
       return l;
@@ -32294,12 +32294,12 @@
       {
         const sh = new Shape();
         roundRect(sh, 9, -(9 + d - 18), w - 18, d - 18, 10);
-        g.add(loopL(sh.getPoints(12).map((p) => W(p.x, -p.y, 7.06)), lineMat));
+        g.add(loopL(sh.getPoints(12).map((p) => W2(p.x, -p.y, 7.06)), lineMat));
       }
       screws.forEach(([x, y]) => {
         const s = new Mesh(new CircleGeometry(3 * TS, 24), recessMat);
         s.rotation.x = -Math.PI / 2;
-        s.position.copy(W(x, y, 7.05));
+        s.position.copy(W2(x, y, 7.05));
         g.add(s);
         seg([[[x - 1.8, y, 7.2], [x + 1.8, y, 7.2]]], g);
       });
@@ -32310,13 +32310,13 @@
       {
         const h = new Mesh(new PlaneGeometry(w * 1.2, d * 1.2), haze);
         h.rotation.x = -Math.PI / 2;
-        h.position.copy(W(cx, cy, -0.5));
+        h.position.copy(W2(cx, cy, -0.5));
         g.add(h);
       }
       {
         const h = new Mesh(new PlaneGeometry(w, d), shadow);
         h.rotation.x = -Math.PI / 2;
-        h.position.copy(W(cx, cy + 4, -0.8));
+        h.position.copy(W2(cx, cy + 4, -0.8));
         g.add(h);
       }
       haze.uniforms.color.value.copy(accent);
@@ -32483,10 +32483,10 @@
     }
     const onTop = (cx, cy, z) => (m) => {
       m.rotation.x = -Math.PI / 2;
-      m.position.copy(W(cx, cy, z + 0.12));
+      m.position.copy(W2(cx, cy, z + 0.12));
     };
     const onFront = (cx, y, cz) => (m) => {
-      m.position.copy(W(cx, y + 0.12, cz));
+      m.position.copy(W2(cx, y + 0.12, cz));
     };
     function sideCanvas(x, yRight, ztop, w, h, P, parent, transparent = false) {
       const c = document.createElement("canvas");
@@ -32497,7 +32497,7 @@
       tex.anisotropy = 8;
       const m = new Mesh(new PlaneGeometry(w * TS, h * TS), new MeshBasicMaterial({ map: tex, toneMapped: false, transparent, depthWrite: !transparent, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -12 }));
       m.rotation.y = Math.PI / 2;
-      m.position.copy(W(x + 0.3, yRight - w / 2, ztop - h / 2));
+      m.position.copy(W2(x + 0.3, yRight - w / 2, ztop - h / 2));
       parent.add(m);
       return { c, x: c.getContext("2d"), tex, P, mesh: m };
     }
@@ -32535,11 +32535,11 @@
     const ledOffMat = new MeshBasicMaterial({ color: theme === "light" ? 12830408 : 2829872, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -12 });
     const dotFront = (x, y, z, r, parent, mat = ledOffMat) => {
       const m = new Mesh(new CircleGeometry(r * TS, 16), mat);
-      m.position.copy(W(x, y + 0.15, z));
+      m.position.copy(W2(x, y + 0.15, z));
       parent.add(m);
       return m;
     };
-    const loopPts = (sh, map, n = 8) => sh.getPoints(n).map((p) => W(...map(p.x, p.y)));
+    const loopPts = (sh, map, n = 8) => sh.getPoints(n).map((p) => W2(...map(p.x, p.y)));
     const bezier = (P0, P1, P2, P3, n = 40) => Array.from({ length: n + 1 }, (_, i) => {
       const t = i / n;
       return P0.map((_2, j) => (1 - t) ** 3 * P0[j] + 3 * (1 - t) ** 2 * t * P1[j] + 3 * (1 - t) * t * t * P2[j] + t ** 3 * P3[j]);
@@ -32553,7 +32553,7 @@
       return pts[i - 1].map((v, j) => v + (pts[i][j] - v) * f);
     };
     const moveGlow = (gp, p, k) => {
-      gp.geometry.attributes.position.setXYZ(0, ...W(...p).toArray());
+      gp.geometry.attributes.position.setXYZ(0, ...W2(...p).toArray());
       gp.geometry.attributes.position.needsUpdate = true;
       gp.material.uniforms.intensity.value = k;
     };
@@ -32726,7 +32726,7 @@
       ac,
       flashes,
       caps,
-      W,
+      W: W2,
       TS,
       THREE: three_module_exports,
       roundRectShape: roundRect,
@@ -32736,7 +32736,7 @@
       addOutline
     };
   }
-  var G3, TS, W, NOISE, THEMES, pal3;
+  var G3, TS, W2, NOISE, THEMES, pal3;
   var init_machines = __esm({
     "engine/machines.js"() {
       init_three_module();
@@ -32751,7 +32751,7 @@
       G3 = window.ISOGLOW3D = window.ISOGLOW3D || {};
       G3.figures = G3.figures || {};
       TS = 0.01;
-      W = (x, y, z) => new Vector3(x * TS, z * TS, y * TS);
+      W2 = (x, y, z) => new Vector3(x * TS, z * TS, y * TS);
       NOISE = `float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }`;
       THEMES = {
         dark: { bg: 1184532, body: 1776671, lamp: 1711394, line: 5198679, major: 3750975, edge: 2566444, sky: 14542079, ground: 526344, hemi: 0.7, amb: 0, sun: 0.7, fill: 0.2, shadow: 0.7, fadeMin: 0.45 },
@@ -32784,7 +32784,7 @@
           const c = b.getCenter(new Vector3());
           return new Vector3(c.x, b.max.y, c.z);
         }
-        const toV = (p) => p && p.isVector3 ? p : W(...p);
+        const toV = (p) => p && p.isVector3 ? p : W2(...p);
         function plan(script, fig, fps) {
           const evs = (script || []).filter((e) => e && e.type && e.type !== "demo" && e.target).slice().sort((a, b) => a.frame - b.frame);
           const g = [];
@@ -32985,7 +32985,7 @@
         };
         const circlePts = (cx, cy, cz, r, axis, n = 48) => Array.from({ length: n }, (_, i) => {
           const a = i / n * Math.PI * 2;
-          return axis === "y" ? W(cx + r * Math.cos(a), cy, cz + r * Math.sin(a)) : W(cx + r * Math.cos(a), cy + r * Math.sin(a), cz);
+          return axis === "y" ? W2(cx + r * Math.cos(a), cy, cz + r * Math.sin(a)) : W2(cx + r * Math.cos(a), cy + r * Math.sin(a), cz);
         });
         const rim = (parent, cx, cy, cz, r, axis, mat = lineMat) => {
           if (LINES) parent.add(loopL(circlePts(cx, cy, cz, r, axis), mat));
@@ -33013,7 +33013,7 @@
           const vx = X0 + BW - u(MM.VF_X) - u(MM.VF_W), vt = ZT - u(MM.VF_TOP), vw = u(MM.VF_W), vh = u(MM.VF_H);
           frontInset(body, vx, YF, vt, vw, vh, 1.2);
           const gl = new Mesh(new PlaneGeometry(vw * TS * 0.9, vh * TS * 0.9), glassMat);
-          gl.position.copy(W(vx + vw / 2, YF + 0.2, vt - vh / 2));
+          gl.position.copy(W2(vx + vw / 2, YF + 0.2, vt - vh / 2));
           body.add(gl);
         }
         const lcdCx = X0 + BW - u(MM.LCD_X) - u(MM.LCD_W) / 2, lcdCz = PZ + u(MM.LCD_BOT) + u(MM.LCD_H) / 2, lcdW = u(MM.LCD_W), lcdH = u(MM.LCD_H);
@@ -33024,13 +33024,13 @@
         }
         const lcd = faceCanvas("front", lcdCx - lcdW / 2, Y0, lcdCz + lcdH / 2, lcdW, lcdH, 8, body);
         lcd.mesh.rotation.y = Math.PI;
-        lcd.mesh.position.copy(W(lcdCx, Y0 - 0.95, lcdCz));
+        lcd.mesh.position.copy(W2(lcdCx, Y0 - 0.95, lcdCz));
         const lcdHalo = softMat(16777215, true);
         lcdHalo.uniforms.color.value.copy(accent);
         {
           const h = new Mesh(new PlaneGeometry(lcdW * TS * 1.3, lcdH * TS * 1.3), lcdHalo);
           h.rotation.y = Math.PI;
-          h.position.copy(W(lcdCx, Y0 - 1.6, lcdCz));
+          h.position.copy(W2(lcdCx, Y0 - 1.6, lcdCz));
           body.add(h);
         }
         const LX = X0 + BW * MM.LENS_CX, LZ = PZ + BH * MM.LENS_CZ;
@@ -33045,21 +33045,21 @@
           const a = [];
           for (let i = 0; i < n; i++) {
             const t = i / n * Math.PI * 2, x = r * Math.cos(t), z = r * Math.sin(t);
-            a.push(...W(x, -len / 2 + 0.6, z).toArray(), ...W(x, len / 2 - 0.6, z).toArray());
+            a.push(...W2(x, -len / 2 + 0.6, z).toArray(), ...W2(x, len / 2 - 0.6, z).toArray());
           }
           parent.add(C.fat(a, mat));
         };
         let y = YF;
         {
           const m = cylZ(u(MM.R_AP) + 1.2, u(MM.L_FLANGE), barrelMat);
-          m.position.copy(W(LX, y + u(MM.L_FLANGE) / 2, LZ));
+          m.position.copy(W2(LX, y + u(MM.L_FLANGE) / 2, LZ));
           body.add(outline(m));
           rim(body, LX, y + u(MM.L_FLANGE), LZ, u(MM.R_AP) + 1.2, "y");
           if (LINES) seg([[[LX, y + u(MM.L_FLANGE) + 0.1, LZ + u(MM.R_AP) + 1.3], [LX, y + u(MM.L_FLANGE) + 0.1, LZ + u(MM.R_AP) - 0.6]]], body, accentLineMat);
           y += u(MM.L_FLANGE);
         }
         const apRing = new Group();
-        apRing.position.copy(W(LX, y + u(MM.L_AP) / 2, LZ));
+        apRing.position.copy(W2(LX, y + u(MM.L_AP) / 2, LZ));
         body.add(apRing);
         {
           const m = cylZ(u(MM.R_AP), u(MM.L_AP), barrelMat);
@@ -33069,14 +33069,14 @@
             apRing.add(loopL(circlePts(0, u(MM.L_AP) / 2, 0, u(MM.R_AP), "y"), lineMat));
             apRing.add(loopL(circlePts(0, -u(MM.L_AP) / 2, 0, u(MM.R_AP), "y"), lineMat));
           }
-          const a = [...W(0, u(MM.L_AP) / 2 + 0.12, u(MM.R_AP) + 0.1).toArray(), ...W(0, u(MM.L_AP) / 2 + 0.12, u(MM.R_AP) - 2.4).toArray()];
+          const a = [...W2(0, u(MM.L_AP) / 2 + 0.12, u(MM.R_AP) + 0.1).toArray(), ...W2(0, u(MM.L_AP) / 2 + 0.12, u(MM.R_AP) - 2.4).toArray()];
           apRing.add(C.fat(a, accentLineMat));
           y += u(MM.L_AP);
         }
         const apRingY = y - u(MM.L_AP) / 2;
         {
           const m = cylZ(u(MM.R_CTRL), u(MM.L_CTRL), barrelMat);
-          m.position.copy(W(LX, y + u(MM.L_CTRL) / 2, LZ));
+          m.position.copy(W2(LX, y + u(MM.L_CTRL) / 2, LZ));
           body.add(outline(m));
           knurl(m, u(MM.R_CTRL) + 0.05, u(MM.L_CTRL), 48, majorMat);
           rim(body, LX, y + u(MM.L_CTRL), LZ, u(MM.R_CTRL), "y");
@@ -33085,27 +33085,27 @@
         const yFront = y + u(MM.L_FRONT);
         {
           const side = cylZ(u(MM.R_FRONT), u(MM.L_FRONT), barrelMat, true);
-          side.position.copy(W(LX, y + u(MM.L_FRONT) / 2, LZ));
+          side.position.copy(W2(LX, y + u(MM.L_FRONT) / 2, LZ));
           body.add(outline(side));
           const face = ringZ(u(MM.BORE), u(MM.R_FRONT), barrelMat);
-          face.position.copy(W(LX, yFront, LZ));
+          face.position.copy(W2(LX, yFront, LZ));
           body.add(face);
           const bore = cylZ(u(MM.BORE), u(MM.L_FRONT) + 4, recessMat, true);
-          bore.position.copy(W(LX, yFront - (u(MM.L_FRONT) + 4) / 2, LZ));
+          bore.position.copy(W2(LX, yFront - (u(MM.L_FRONT) + 4) / 2, LZ));
           body.add(bore);
           rim(body, LX, yFront, LZ, u(MM.R_FRONT), "y");
           rim(body, LX, yFront, LZ, u(MM.BORE), "y", majorMat);
           rim(body, LX, y, LZ, u(MM.R_FRONT), "y");
         }
         const glass = ringZ(1e-3, u(MM.BORE) - 0.3, glassMat);
-        glass.position.copy(W(LX, yFront - 1.5, LZ));
+        glass.position.copy(W2(LX, yFront - 1.5, LZ));
         body.add(glass);
         const apSize = (u(MM.BORE) - 0.6) * 2;
         const apCv = faceCanvas("front", LX - apSize / 2, yFront - 6, LZ + apSize / 2, apSize, apSize, 10, body, true);
         const cylY = (r, h, mat, n = 56) => new Mesh(new CylinderGeometry(r * TS, r * TS, h * TS, n), mat);
         const dialAt = (cx, cy, r, h, nk, withTicks) => {
           const g = new Group();
-          g.position.copy(W(cx, cy, ZT + h / 2));
+          g.position.copy(W2(cx, cy, ZT + h / 2));
           body.add(g);
           const m = cylY(r, h, metalMat);
           g.add(outline(m));
@@ -33115,14 +33115,14 @@
             const a = [];
             for (let i = 0; i < nk; i++) {
               const t = i / nk * Math.PI * 2, x = r * Math.cos(t), yy = r * Math.sin(t);
-              a.push(...W(x, yy, -h / 2 + 0.5).toArray(), ...W(x, yy, h / 2 - 0.5).toArray());
+              a.push(...W2(x, yy, -h / 2 + 0.5).toArray(), ...W2(x, yy, h / 2 - 0.5).toArray());
             }
             g.add(C.fat(a, lineMat));
             if (withTicks) {
               const t2 = [];
               for (let i = 0; i < 12; i++) {
                 const t = i / 12 * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
-                t2.push(...W((r - 3.2) * c, (r - 3.2) * s, h / 2 + 0.1).toArray(), ...W((r - 1.4) * c, (r - 1.4) * s, h / 2 + 0.1).toArray());
+                t2.push(...W2((r - 3.2) * c, (r - 3.2) * s, h / 2 + 0.1).toArray(), ...W2((r - 1.4) * c, (r - 1.4) * s, h / 2 + 0.1).toArray());
               }
               g.add(C.fat(t2, majorMat));
             }
@@ -33131,13 +33131,13 @@
         };
         const ssDial = dialAt(X0 + BW * MM.SS_CX, Y0 + BD / 2, u(MM.SS_R), u(MM.SS_H), 36, true);
         {
-          const a = [...W(0, u(MM.SS_R) - 1.2, u(MM.SS_H) / 2 + 0.12).toArray(), ...W(0, u(MM.SS_R) - 3.6, u(MM.SS_H) / 2 + 0.12).toArray()];
+          const a = [...W2(0, u(MM.SS_R) - 1.2, u(MM.SS_H) / 2 + 0.12).toArray(), ...W2(0, u(MM.SS_R) - 3.6, u(MM.SS_H) / 2 + 0.12).toArray()];
           ssDial.add(C.fat(a, accentLineMat));
         }
         const evDial = dialAt(X0 + BW * MM.EV_CX, Y0 + BD / 2 + u(MM.EV_DY), u(MM.EV_R), u(MM.EV_H), 28, true);
         const shX = X0 + BW * MM.SH_CX, shY = Y0 + BD / 2 + u(MM.SH_DY);
         const collar = new Group();
-        collar.position.copy(W(shX, shY, ZT));
+        collar.position.copy(W2(shX, shY, ZT));
         body.add(collar);
         {
           const m = cylY(u(MM.COLLAR_R), u(MM.COLLAR_H), metalMat);
@@ -33148,7 +33148,7 @@
           if (LINES) seg([[[-3.5, 0, u(MM.COLLAR_H) + 0.1], [3.5, 0, u(MM.COLLAR_H) + 0.1]]], collar, majorMat);
         }
         const btnPivot = new Group();
-        btnPivot.position.copy(W(shX, shY, ZT + u(MM.COLLAR_H)));
+        btnPivot.position.copy(W2(shX, shY, ZT + u(MM.COLLAR_H)));
         body.add(btnPivot);
         const btn = new Group();
         btnPivot.add(btn);
@@ -33164,7 +33164,7 @@
         }
         {
           const m = cylZ(u(MM.FCD_R), u(MM.FCD_OUT) * 2, metalMat);
-          m.position.copy(W(X0 + BW * MM.FCD_CX, YF, ZT - u(MM.FCD_TOP)));
+          m.position.copy(W2(X0 + BW * MM.FCD_CX, YF, ZT - u(MM.FCD_TOP)));
           body.add(outline(m));
           rim(body, X0 + BW * MM.FCD_CX, YF + u(MM.FCD_OUT), ZT - u(MM.FCD_TOP), u(MM.FCD_R), "y");
         }
@@ -33492,7 +33492,7 @@
         plateWith(g0, 118, 110, [[11, 11], [107, 11], [11, 99], [107, 99]], null);
         const PX = 33.5, PY = 27, PZ = 7, BW = 51, BD = 56;
         const ph = new Group();
-        ph.position.copy(W(PX, PY, PZ));
+        ph.position.copy(W2(PX, PY, PZ));
         g0.add(ph);
         rbox(0.6, 0.6, 0, BW - 1.2, BD - 1.2, 1.4, 7, rubber, ph);
         const PROF = [[56, 1.4, 0], [56, 8, 5.5], [26, 22.5, 6.5], [0, 22.5, 7], [0, 1.4, 0]];
@@ -33533,16 +33533,16 @@
         ph.add(plg);
         const PLG_UP = 1.7;
         [18.5, 32.5].forEach((x) => {
-          reg(cyl(1.6, 1.6, 5.5, 20, plastic, plg, W(x, CUPY, 22.5 + 2.75)));
+          reg(cyl(1.6, 1.6, 5.5, 20, plastic, plg, W2(x, CUPY, 22.5 + 2.75)));
         });
         const HS0 = [25.5, CUPY, 27.5], hs = new Group();
         ph.add(hs);
         [-18.5, 18.5].forEach((x) => {
-          reg(cyl(6.2, 5.4, 5, 28, plastic, hs, W(x, 0, 0)));
-          reg(cyl(2.8, 2.8, 1.2, 20, plastic, hs, W(x, 0, 2.9)));
+          reg(cyl(6.2, 5.4, 5, 28, plastic, hs, W2(x, 0, 0)));
+          reg(cyl(2.8, 2.8, 1.2, 20, plastic, hs, W2(x, 0, 2.9)));
         });
         {
-          const pts = [[-18.5, 0, 2.6], [-11, 0, 3.4], [0, 0, 3.9], [11, 0, 3.4], [18.5, 0, 2.6]].map((p) => W(...p));
+          const pts = [[-18.5, 0, 2.6], [-11, 0, 3.4], [0, 0, 3.9], [11, 0, 3.4], [18.5, 0, 2.6]].map((p) => W2(...p));
           const curve = new CatmullRomCurve3(pts);
           const m = new Mesh(new TubeGeometry(curve, 28, 2.2 * TS2, 14, false), plastic);
           reg(m);
@@ -33553,15 +33553,15 @@
         const HS_LIFT = { dpos: [-18, 6, 17], rotZ: 40 * D2R };
         function setPose(o, t) {
           const k = t;
-          o.position.copy(W(HS0[0] + HS_LIFT.dpos[0] * k, HS0[1] + HS_LIFT.dpos[1] * k, HS0[2] + HS_LIFT.dpos[2] * k));
+          o.position.copy(W2(HS0[0] + HS_LIFT.dpos[0] * k, HS0[1] + HS_LIFT.dpos[1] * k, HS0[2] + HS_LIFT.dpos[2] * k));
           o.rotation.set(0, 0, HS_LIFT.rotZ * k);
         }
         function hsWorld(t, local) {
           setPose(hsProxy, t);
           hsProxy.updateWorldMatrix(true, false);
-          return hsProxy.localToWorld(W(...local));
+          return hsProxy.localToWorld(W2(...local));
         }
-        reg(cyl(1.5, 1.8, 5.5, 16, rubber, ph, W(-2.5, 38, 8), [0, 0, Math.PI / 2]));
+        reg(cyl(1.5, 1.8, 5.5, 16, rubber, ph, W2(-2.5, 38, 8), [0, 0, Math.PI / 2]));
         const CORD_N = 420, CORD_TURNS = 22, CORD_R = 1.7, cordPts = [];
         function cordPath(t) {
           const P3 = iso(ph.worldToLocal(hsWorld(t, [-23.4, 0, -1.6])));
@@ -33584,7 +33584,7 @@
         }
         const cordFlat = () => {
           const out = [];
-          for (let i = 0; i < cordPts.length - 1; i++) out.push(...W(...cordPts[i]).toArray(), ...W(...cordPts[i + 1]).toArray());
+          for (let i = 0; i < cordPts.length - 1; i++) out.push(...W2(...cordPts[i]).toArray(), ...W2(...cordPts[i + 1]).toArray());
           return out;
         };
         cordPath(0);
@@ -33597,7 +33597,7 @@
           buf.needsUpdate = true;
         }
         const dial = new Group();
-        dial.position.copy(W(...DIAL_C));
+        dial.position.copy(W2(...DIAL_C));
         dial.rotation.x = TILT;
         ph.add(dial);
         const R_PLATE = 10.2, R_WHEEL = 9.3, R_HOLE = 7.25, HOLE_R = 1.375, R_CAP = 3.3, STOP_DEG = 120;
@@ -33800,14 +33800,14 @@
           const m = new Mesh(g, mat);
           if (axis === "x") m.rotation.z = Math.PI / 2;
           else if (axis === "y") m.rotation.x = Math.PI / 2;
-          m.position.copy(W(cx, cy, cz));
+          m.position.copy(W2(cx, cy, cz));
           if (lines) C.meshes.push(m);
           parent.add(m);
           return m;
         }
         const ring2d = (cx, cz, y, r, n, mat) => loopL(Array.from({ length: n }, (_, i) => {
           const a = i / n * Math.PI * 2;
-          return W(cx + r * Math.cos(a), y, cz + r * Math.sin(a));
+          return W2(cx + r * Math.cos(a), y, cz + r * Math.sin(a));
         }), mat);
         const onFront = (x, z) => C.onFront(x, CF + 0.45, z);
         plateWith(g0, 300, 268, [[18, 18], [282, 18], [18, 250], [282, 250]], null);
@@ -33819,7 +33819,7 @@
         {
           const sh = new Shape();
           C.roundRect(sh, 0, 0, 34, 66, 4);
-          body.add(loopL(sh.getPoints(10).map((p) => W(BX + 4 + p.x, CF + 0.08, 12 + p.y)), lineMat));
+          body.add(loopL(sh.getPoints(10).map((p) => W2(BX + 4 + p.x, CF + 0.08, 12 + p.y)), lineMat));
         }
         rbox(148, 100, 45, 16, 40, 30, 4, plasticMat, body);
         {
@@ -33833,13 +33833,13 @@
         {
           const h = new Mesh(new PlaneGeometry(12 * TS2, 34 * TS2), slitGlow);
           h.rotation.x = -Math.PI / 2;
-          h.position.copy(W(156, 120, 75.4));
+          h.position.copy(W2(156, 120, 75.4));
           body.add(h);
         }
         C.frontInset(body, 150, 140, 64, 15, 14, 2);
         C.frontInset(body, 113, CF, 54, 26, 34, 2);
         const knobPivot = new Group();
-        knobPivot.position.copy(W(KX, CF + 0.1, KZ));
+        knobPivot.position.copy(W2(KX, CF + 0.1, KZ));
         body.add(knobPivot);
         const knob = new Group();
         knob.userData = { pressAxis: "z", pressDepth: 0.8 };
@@ -33857,7 +33857,7 @@
           label(t, 18, 5, 3.4, onFront(KX + 10.5 * Math.sin(a), KZ + 10.5 * Math.cos(a)), body);
         });
         const lever = new Group();
-        lever.position.copy(W(116, CF, 44));
+        lever.position.copy(W2(116, CF, 44));
         body.add(lever);
         rbox(-1.2, 0, -1.5, 2.4, 2.6, 3, 0.6, metalMat, lever);
         {
@@ -33883,7 +33883,7 @@
         cyl(154, T[0], T[1], 1.3, 16, "x", metalMat, body, { lines: false });
         function reel(cy, cz, r0) {
           const g = new Group();
-          g.position.copy(W(FX, cy, cz));
+          g.position.copy(W2(FX, cy, cz));
           g.rotation.y = Math.PI / 2;
           g0.add(g);
           const flange = () => {
@@ -33928,7 +33928,7 @@
         const supply = reel(S[0], S[1], RS0), takeup = reel(T[0], T[1], RT0);
         function sprocket(cy, cz) {
           const g = new Group();
-          g.position.copy(W(FX, cy, cz));
+          g.position.copy(W2(FX, cy, cz));
           g.rotation.y = Math.PI / 2;
           g0.add(g);
           const m = new Mesh(new CylinderGeometry(SPR_R * TS2, SPR_R * TS2, 5 * TS2, 24, 1), metalMat);
@@ -33961,7 +33961,7 @@
         cyl(FX, LY + 11.2, LZ, 6, 22.4, "y", metalMat, lens);
         const focus = new Group();
         lens.add(focus);
-        focus.position.copy(W(FX, LY + 5.6, LZ));
+        focus.position.copy(W2(FX, LY + 5.6, LZ));
         {
           const m = new Mesh(new CylinderGeometry(7 * TS2, 7 * TS2, 5 * TS2, 36, 1), rubberMat);
           m.rotation.x = Math.PI / 2;
@@ -33981,7 +33981,7 @@
         cyl(FX, LY + 26.6, LZ, 5.2, 4.4, "y", metalMat, inner);
         {
           const gl = new Mesh(new CircleGeometry(4.8 * TS2, 36), glassMat);
-          gl.position.copy(W(FX, LY + 28.85, LZ));
+          gl.position.copy(W2(FX, LY + 28.85, LZ));
           inner.add(gl);
           inner.add(ring2d(FX, LZ, LY + 28.9, 4.8, 36, majorMat));
         }
@@ -33992,7 +33992,7 @@
         function quad(p, parent, mat) {
           const g = new BufferGeometry();
           const v = [];
-          p.forEach((q) => v.push(...W(...q).toArray()));
+          p.forEach((q) => v.push(...W2(...q).toArray()));
           g.setAttribute("position", new Float32BufferAttribute([...v.slice(0, 9), ...v.slice(6, 12), ...v.slice(0, 3)], 3));
           g.setAttribute("uv", new Float32BufferAttribute([0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0], 2));
           const m = new Mesh(g, mat);
@@ -34003,11 +34003,11 @@
         const BEAM_END = 258, BW2 = 22, BH2 = 16;
         quad([[FX - 4.8, LENS_FRONT, LZ], [FX + 4.8, LENS_FRONT, LZ], [FX + BW2, BEAM_END, LZ], [FX - BW2, BEAM_END, LZ]], g0, beamMat);
         quad([[FX, LENS_FRONT, LZ - 4.8], [FX, LENS_FRONT, LZ + 4.8], [FX, BEAM_END, LZ + BH2], [FX, BEAM_END, LZ - BH2]], g0, beamMat);
-        const beamEdges = C.fat([[-1, -1], [1, -1], [1, 1], [-1, 1]].flatMap(([sx, sz]) => [...W(FX + sx * 4.4, LENS_FRONT, LZ + sz * 3.4).toArray(), ...W(FX + sx * BW2, BEAM_END, LZ + sz * BH2).toArray()]), beamLineMat);
+        const beamEdges = C.fat([[-1, -1], [1, -1], [1, 1], [-1, 1]].flatMap(([sx, sz]) => [...W2(FX + sx * 4.4, LENS_FRONT, LZ + sz * 3.4).toArray(), ...W2(FX + sx * BW2, BEAM_END, LZ + sz * BH2).toArray()]), beamLineMat);
         g0.add(beamEdges);
-        const lensGlow = glowPoints([W(FX, LENS_FRONT + 0.3, LZ)], 0.3);
+        const lensGlow = glowPoints([W2(FX, LENS_FRONT + 0.3, LZ)], 0.3);
         g0.add(lensGlow);
-        const gateGlow = glowPoints([W(FX + 0.6, GY, 71.8), W(FX + 0.6, GY, 45.8)], 0.12);
+        const gateGlow = glowPoints([W2(FX + 0.6, GY, 71.8), W2(FX + 0.6, GY, 45.8)], 0.12);
         g0.add(gateGlow);
         const NSEG = 120;
         const film = C.fat(new Array(NSEG * 6).fill(0), filmLineMat);
@@ -34067,7 +34067,7 @@
           const raw = filmPath(st.rS, st.rT, st.pulse), cum = C.cumLen(raw), pts = Array.from({ length: NSEG + 1 }, (_, i) => C.alongPts(raw, cum, i / NSEG));
           const buf = film.geometry.attributes.instanceStart.data, a = buf.array;
           for (let i = 0; i < NSEG; i++) {
-            const p = W(FX, pts[i][0], pts[i][1]), q = W(FX, pts[i + 1][0], pts[i + 1][1]);
+            const p = W2(FX, pts[i][0], pts[i][1]), q = W2(FX, pts[i + 1][0], pts[i + 1][1]);
             a[i * 6] = p.x;
             a[i * 6 + 1] = p.y;
             a[i * 6 + 2] = p.z;
@@ -34265,7 +34265,7 @@
           const tz = this.ease(Math.min(1, Math.max(0, frame - this.prm.move_from) / Math.max(1, this.prm.zoom_frames))), zoom = pose.zoom * (this.prm.zoom_start + (this.prm.zoom_end - this.prm.zoom_start) * tz);
           const to = this.ease(Math.min(1, Math.max(0, frame - this.prm.move_from) / Math.max(1, this.prm.orbit_frames))), ang = MathUtils.degToRad(this.prm.orbit_deg * to + (pose.orbit || 0));
           const dir = new Vector3(1, 1, 1).normalize().applyAxisAngle(new Vector3(0, 1, 0), ang);
-          const target = pose.target.isVector3 ? pose.target.clone() : W(...pose.target);
+          const target = pose.target.isVector3 ? pose.target.clone() : W2(...pose.target);
           const cam = mode === "iso" ? C.ortho : C.persp, dist = dist0 / zoom;
           cam.position.copy(target).addScaledVector(dir, dist);
           cam.lookAt(target);
@@ -34388,9 +34388,9 @@
   };
   var lastPresentedSample = (samples) => {
     let result = void 0;
-    for (let sample of samples) {
-      if (!result || sample.presentationTimestamp > result.presentationTimestamp) {
-        result = sample;
+    for (let sample2 of samples) {
+      if (!result || sample2.presentationTimestamp > result.presentationTimestamp) {
+        result = sample2;
       }
     }
     return result;
@@ -34889,7 +34889,7 @@
   var stss = (track) => {
     if (track.samples.every((x) => x.type === "key"))
       return null;
-    let keySamples = [...track.samples.entries()].filter(([, sample]) => sample.type === "key");
+    let keySamples = [...track.samples.entries()].filter(([, sample2]) => sample2.type === "key");
     return fullBox("stss", 0, 0, [
       u32(keySamples.length),
       // Number of entries
@@ -34978,12 +34978,12 @@
       // Sequence number
     ]);
   };
-  var fragmentSampleFlags = (sample) => {
+  var fragmentSampleFlags = (sample2) => {
     let byte1 = 0;
     let byte2 = 0;
     let byte3 = 0;
     let byte4 = 0;
-    let sampleIsDifferenceSample = sample.type === "delta";
+    let sampleIsDifferenceSample = sample2.type === "delta";
     byte2 |= +sampleIsDifferenceSample;
     if (sampleIsDifferenceSample) {
       byte1 |= 1;
@@ -35571,8 +35571,8 @@
       __privateMethod(this, _prepareTracks, prepareTracks_fn).call(this);
       __privateMethod(this, _writeHeader, writeHeader_fn).call(this);
     }
-    addVideoChunk(sample, meta, timestamp, compositionTimeOffset) {
-      if (!(sample instanceof EncodedVideoChunk)) {
+    addVideoChunk(sample2, meta, timestamp, compositionTimeOffset) {
+      if (!(sample2 instanceof EncodedVideoChunk)) {
         throw new TypeError("addVideoChunk's first argument (sample) must be of type EncodedVideoChunk.");
       }
       if (meta && typeof meta !== "object") {
@@ -35588,13 +35588,13 @@
           "addVideoChunk's fourth argument (compositionTimeOffset), when provided, must be a real number."
         );
       }
-      let data = new Uint8Array(sample.byteLength);
-      sample.copyTo(data);
+      let data = new Uint8Array(sample2.byteLength);
+      sample2.copyTo(data);
       this.addVideoChunkRaw(
         data,
-        sample.type,
-        timestamp ?? sample.timestamp,
-        sample.duration,
+        sample2.type,
+        timestamp ?? sample2.timestamp,
+        sample2.duration,
         meta,
         compositionTimeOffset
       );
@@ -35641,8 +35641,8 @@
         __privateMethod(this, _addSampleToTrack, addSampleToTrack_fn).call(this, __privateGet(this, _videoTrack), videoSample);
       }
     }
-    addAudioChunk(sample, meta, timestamp) {
-      if (!(sample instanceof EncodedAudioChunk)) {
+    addAudioChunk(sample2, meta, timestamp) {
+      if (!(sample2 instanceof EncodedAudioChunk)) {
         throw new TypeError("addAudioChunk's first argument (sample) must be of type EncodedAudioChunk.");
       }
       if (meta && typeof meta !== "object") {
@@ -35653,9 +35653,9 @@
           "addAudioChunk's third argument (timestamp), when provided, must be a non-negative real number."
         );
       }
-      let data = new Uint8Array(sample.byteLength);
-      sample.copyTo(data);
-      this.addAudioChunkRaw(data, sample.type, timestamp ?? sample.timestamp, sample.duration, meta);
+      let data = new Uint8Array(sample2.byteLength);
+      sample2.copyTo(data);
+      this.addAudioChunkRaw(data, sample2.type, timestamp ?? sample2.timestamp, sample2.duration, meta);
     }
     addAudioChunkRaw(data, type, timestamp, duration, meta) {
       if (!(data instanceof Uint8Array)) {
@@ -35736,9 +35736,9 @@
         __privateGet(this, _mdat).size = mdatSize;
         __privateGet(this, _writer).writeBox(__privateGet(this, _mdat));
         for (let chunk of __privateGet(this, _finalizedChunks)) {
-          for (let sample of chunk.samples) {
-            __privateGet(this, _writer).write(sample.data);
-            sample.data = null;
+          for (let sample2 of chunk.samples) {
+            __privateGet(this, _writer).write(sample2.data);
+            sample2.data = null;
           }
         }
       } else if (__privateGet(this, _options).fastStart === "fragmented") {
@@ -35992,7 +35992,7 @@
         Object.assign(track.info.decoderConfig, meta.decoderConfig);
       }
     }
-    let sample = {
+    let sample2 = {
       presentationTimestamp: presentationTimestampInSeconds,
       decodeTimestamp: decodeTimestampInSeconds,
       duration: durationInSeconds,
@@ -36002,16 +36002,16 @@
       // Will be refined once the next sample comes in
       timescaleUnitsToNextSample: intoTimescale(durationInSeconds, track.timescale)
     };
-    return sample;
+    return sample2;
   };
   _addSampleToTrack = /* @__PURE__ */ new WeakSet();
-  addSampleToTrack_fn = function(track, sample) {
+  addSampleToTrack_fn = function(track, sample2) {
     if (__privateGet(this, _options).fastStart !== "fragmented") {
-      track.samples.push(sample);
+      track.samples.push(sample2);
     }
-    const sampleCompositionTimeOffset = intoTimescale(sample.presentationTimestamp - sample.decodeTimestamp, track.timescale);
+    const sampleCompositionTimeOffset = intoTimescale(sample2.presentationTimestamp - sample2.decodeTimestamp, track.timescale);
     if (track.lastTimescaleUnits !== null) {
-      let timescaleUnits = intoTimescale(sample.decodeTimestamp, track.timescale, false);
+      let timescaleUnits = intoTimescale(sample2.decodeTimestamp, track.timescale, false);
       let delta = Math.round(timescaleUnits - track.lastTimescaleUnits);
       track.lastTimescaleUnits += delta;
       track.lastSample.timescaleUnitsToNextSample = delta;
@@ -36044,7 +36044,7 @@
       if (__privateGet(this, _options).fastStart !== "fragmented") {
         track.timeToSampleTable.push({
           sampleCount: 1,
-          sampleDelta: intoTimescale(sample.duration, track.timescale)
+          sampleDelta: intoTimescale(sample2.duration, track.timescale)
         });
         track.compositionTimeOffsetTable.push({
           sampleCount: 1,
@@ -36052,16 +36052,16 @@
         });
       }
     }
-    track.lastSample = sample;
+    track.lastSample = sample2;
     let beginNewChunk = false;
     if (!track.currentChunk) {
       beginNewChunk = true;
     } else {
-      let currentChunkDuration = sample.presentationTimestamp - track.currentChunk.startTimestamp;
+      let currentChunkDuration = sample2.presentationTimestamp - track.currentChunk.startTimestamp;
       if (__privateGet(this, _options).fastStart === "fragmented") {
         let mostImportantTrack = __privateGet(this, _videoTrack) ?? __privateGet(this, _audioTrack);
         const chunkDuration = __privateGet(this, _options).minFragmentDuration ?? 1;
-        if (track === mostImportantTrack && sample.type === "key" && currentChunkDuration >= chunkDuration) {
+        if (track === mostImportantTrack && sample2.type === "key" && currentChunkDuration >= chunkDuration) {
           beginNewChunk = true;
           __privateMethod(this, _finalizeFragment, finalizeFragment_fn).call(this);
         }
@@ -36074,11 +36074,11 @@
         __privateMethod(this, _finalizeCurrentChunk, finalizeCurrentChunk_fn).call(this, track);
       }
       track.currentChunk = {
-        startTimestamp: sample.presentationTimestamp,
+        startTimestamp: sample2.presentationTimestamp,
         samples: []
       };
     }
-    track.currentChunk.samples.push(sample);
+    track.currentChunk.samples.push(sample2);
   };
   _validateTimestamp = /* @__PURE__ */ new WeakSet();
   validateTimestamp_fn = function(presentationTimestamp, decodeTimestamp, track) {
@@ -36137,9 +36137,9 @@ If you want to offset all timestamps of a track such that the first one is zero,
       return;
     }
     track.currentChunk.offset = __privateGet(this, _writer).pos;
-    for (let sample of track.currentChunk.samples) {
-      __privateGet(this, _writer).write(sample.data);
-      sample.data = null;
+    for (let sample2 of track.currentChunk.samples) {
+      __privateGet(this, _writer).write(sample2.data);
+      sample2.data = null;
     }
     __privateMethod(this, _maybeFlushStreamingTargetWriter, maybeFlushStreamingTargetWriter_fn).call(this);
   };
@@ -36163,8 +36163,8 @@ If you want to offset all timestamps of a track such that the first one is zero,
       let mdatBox = mdat(false);
       let totalTrackSampleSize = 0;
       for (let track of tracks) {
-        for (let sample of track.currentChunk.samples) {
-          totalTrackSampleSize += sample.size;
+        for (let sample2 of track.currentChunk.samples) {
+          totalTrackSampleSize += sample2.size;
         }
       }
       let mdatSize = __privateGet(this, _writer).measureBox(mdatBox) + totalTrackSampleSize;
@@ -36178,9 +36178,9 @@ If you want to offset all timestamps of a track such that the first one is zero,
     for (let track of tracks) {
       track.currentChunk.offset = __privateGet(this, _writer).pos;
       track.currentChunk.moofOffset = moofOffset;
-      for (let sample of track.currentChunk.samples) {
-        __privateGet(this, _writer).write(sample.data);
-        sample.data = null;
+      for (let sample2 of track.currentChunk.samples) {
+        __privateGet(this, _writer).write(sample2.data);
+        sample2.data = null;
       }
     }
     let endPos = __privateGet(this, _writer).pos;
@@ -36209,6 +36209,387 @@ If you want to offset all timestamps of a track such that the first one is zero,
       throw new Error("Cannot add new video or audio chunks after the file has been finalized.");
     }
   };
+
+  // engine/kit.js
+  function makeKit(C) {
+    const { THREE, W: W3, TS: TS2, rbox, seg, plateWith, hazeAndShadow, creases, scene, bodyMat, recessMat, capMat, softMat, glowPoints, meshes, accent, addOutline } = C;
+    const root = new THREE.Group();
+    scene.add(root);
+    const first = meshes.length;
+    const AXIS = { x: new THREE.Vector3(1, 0, 0), y: new THREE.Vector3(0, 0, 1), z: new THREE.Vector3(0, 1, 0) };
+    const dirOf = (s) => {
+      const m = /^([+-])([xyz])$/.exec(s);
+      if (!m) throw new Error(`向きは '+x' や '-y' の形で書いてください（いまは "${s}"）`);
+      return AXIS[m[2]].clone().multiplyScalar(m[1] === "-" ? -1 : 1);
+    };
+    const reg = (m) => {
+      addOutline(m);
+      meshes.push(m);
+      return m;
+    };
+    const clamp2 = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+    const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const std = (o) => new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, ...o });
+    const mats = {
+      paint(k = 1.9) {
+        const m = bodyMat.clone();
+        m.roughness = 0.42;
+        m.metalness = 0.25;
+        m.color.multiplyScalar(k);
+        return m;
+      },
+      metal() {
+        return std({ color: 9409946, roughness: 0.35, metalness: 0.7 });
+      },
+      rubber() {
+        return std({ color: 526602, roughness: 0.95 });
+      },
+      dark() {
+        return recessMat;
+      },
+      glass() {
+        return std({ color: 724240, roughness: 0.2, metalness: 0.4, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 });
+      },
+      // 光る材料。m.set(0〜1.6) で明るさを変える。色は settings.js の accent
+      light() {
+        const m = capMat();
+        m.set = (v) => {
+          m.emissiveIntensity = v;
+        };
+        return m;
+      }
+    };
+    function outline(items) {
+      const sh = new THREE.Shape();
+      const n = items.length;
+      let started = false;
+      const go = (x, y) => {
+        if (started) sh.lineTo(x, y);
+        else {
+          sh.moveTo(x, y);
+          started = true;
+        }
+      };
+      const cut = (a, b, r) => {
+        const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+        return [a[0] + dx / L * r, a[1] + dy / L * r];
+      };
+      items.forEach((p, i) => {
+        if (p.arc) {
+          const [cx, cz, r2, a0, a1] = p.arc;
+          sh.absarc(cx, cz, r2, a0, a1, a1 < a0);
+          started = true;
+          return;
+        }
+        const prev = items[(i + n - 1) % n], next = items[(i + 1) % n], r = p[2] || 0;
+        if (r > 0 && !prev.arc && !next.arc) {
+          const s = cut(p, prev, r), e = cut(p, next, r);
+          go(s[0], s[1]);
+          sh.quadraticCurveTo(p[0], p[1], e[0], e[1]);
+        } else go(p[0], p[1]);
+      });
+      sh.closePath();
+      return sh;
+    }
+    function extrude(shape, { y, mat = bodyMat, parent = root, bevel = 0, lines: lines2 = true }) {
+      const sh = Array.isArray(shape) ? outline(shape) : shape, [y0, y1] = y;
+      const g = new THREE.ExtrudeGeometry(sh, { depth: y1 - y0 - 2 * bevel, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelOffset: -bevel, bevelSegments: 4, curveSegments: 24 });
+      g.translate(0, 0, y0 + bevel);
+      g.scale(TS2, TS2, TS2);
+      const m = new THREE.Mesh(g, mat);
+      parent.add(m);
+      if (lines2) reg(m);
+      return m;
+    }
+    const box2 = (x, y, z, w, d, h, { r = 0.5, mat = bodyMat, parent = root, lines: lines2 = true } = {}) => rbox(x, y, z, w, d, h, r, mat, parent, { lines: lines2 });
+    function cyl({ at, r, len, axis = "z", mat = bodyMat, parent = root, lines: lines2 = true, seg: n = 40 }) {
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(r * TS2, r * TS2, len * TS2, n), mat);
+      if (axis === "x") m.rotation.z = Math.PI / 2;
+      if (axis === "y") m.rotation.x = Math.PI / 2;
+      m.position.copy(W3(...at));
+      parent.add(m);
+      if (lines2) reg(m);
+      return m;
+    }
+    function lathe(profile, { at, axis = "z", mat = bodyMat, parent = root, lines: lines2 = true, seg: n = 48 }) {
+      const g = new THREE.LatheGeometry(profile.map(([r, h]) => new THREE.Vector2(r * TS2, h * TS2)), n);
+      const m = new THREE.Mesh(g, mat);
+      if (axis === "x") m.rotation.z = -Math.PI / 2;
+      if (axis === "y") m.rotation.x = Math.PI / 2;
+      m.position.copy(W3(...at));
+      parent.add(m);
+      if (lines2) reg(m);
+      return m;
+    }
+    function tube(points, { r, mat = bodyMat, parent = root, lines: lines2 = true, seg: n = 64 }) {
+      const curve = new THREE.CatmullRomCurve3(points.map((p) => W3(...p)));
+      const m = new THREE.Mesh(new THREE.TubeGeometry(curve, n, r * TS2, 16, false), mat);
+      parent.add(m);
+      if (lines2) reg(m);
+      return m;
+    }
+    function ball({ at, r, scale = [1, 1, 1], mat = bodyMat, parent = root, lines: lines2 = true }) {
+      const m = new THREE.Mesh(new THREE.SphereGeometry(r * TS2, 32, 24), mat);
+      m.scale.set(scale[0], scale[2], scale[1]);
+      m.position.copy(W3(...at));
+      parent.add(m);
+      if (lines2) reg(m);
+      return m;
+    }
+    function pane(pts, { mat, parent = root }) {
+      const [a, b, c, d] = pts.map((p) => W3(...p));
+      const g = new THREE.BufferGeometry().setFromPoints([a, b, c, a, c, d]);
+      g.setAttribute("uv", new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1], 2));
+      g.computeVertexNormals();
+      const m = new THREE.Mesh(g, mat);
+      parent.add(m);
+      return m;
+    }
+    const lines = (arr, { parent = root, strong = false } = {}) => seg(arr, parent, strong ? C.majorMat : C.lineMat);
+    function group(at = [0, 0, 0], parent = root) {
+      const g = new THREE.Group();
+      g.position.copy(W3(...at));
+      parent.add(g);
+      return g;
+    }
+    function hinge({ at, extends: ex, opens, axis = "z", parent = root }) {
+      const g = group(at, parent), ax = AXIS[axis];
+      const sign2 = Math.sign(ax.clone().cross(dirOf(ex)).dot(dirOf(opens))) || 1;
+      g.set = (deg) => g.setRotationFromAxisAngle(ax, sign2 * deg * Math.PI / 180);
+      return g;
+    }
+    function rotor({ at, axis = "y", parent = root }) {
+      const g = group(at, parent), ax = AXIS[axis];
+      g.set = (deg) => g.setRotationFromAxisAngle(ax, deg * Math.PI / 180);
+      return g;
+    }
+    function slider({ at = [0, 0, 0], to, parent = root }) {
+      const g = group(at, parent), p0 = g.position.clone(), d = W3(...to);
+      g.set = (t) => g.position.copy(p0).addScaledVector(d, t);
+      return g;
+    }
+    function wheel({ at, r, width, side = 1, spokes = 5, parent = root }) {
+      const g = rotor({ at, axis: "y", parent });
+      const rub = mats.rubber(), met = mats.metal(), hub = mats.light(), o = side * width / 2;
+      cyl({ at: [0, 0, 0], r, len: width, axis: "y", mat: rub, parent: g });
+      cyl({ at: [0, o + side * 0.05, 0], r: r * 0.61, len: 0.5, axis: "y", mat: met, parent: g, lines: false });
+      cyl({ at: [0, o + side * 0.1, 0], r: r * 0.5, len: 0.55, axis: "y", mat: recessMat, parent: g, lines: false });
+      cyl({ at: [0, o + side * 0.2, 0], r: r * 0.16, len: 0.7, axis: "y", mat: hub, parent: g, lines: false });
+      for (let i = 0; i < spokes; i++) {
+        const a = i * Math.PI * 2 / spokes, sp = new THREE.Mesh(new THREE.BoxGeometry(r * 0.5 * TS2, r * 0.12 * TS2, 0.7 * TS2), met);
+        sp.position.set(Math.cos(a) * r * 0.3 * TS2, Math.sin(a) * r * 0.3 * TS2, (o + side * 0.2) * TS2);
+        sp.rotation.z = a;
+        g.add(sp);
+      }
+      g.hub = hub;
+      g.spin = (d) => g.set(-d / r * 180 / Math.PI);
+      return g;
+    }
+    function beam({ at, dir = "+x", length, width, parent = root }) {
+      const m = softMat(16777215, true);
+      m.uniforms.color.value.copy(accent);
+      m.side = THREE.DoubleSide;
+      const d = dirOf(dir);
+      const p = new THREE.Mesh(new THREE.PlaneGeometry((Math.abs(d.x) ? length : width) * TS2, (Math.abs(d.x) ? width : length) * TS2), m);
+      p.rotation.x = -Math.PI / 2;
+      p.position.copy(W3(...at)).addScaledVector(d, length / 2 * TS2);
+      parent.add(p);
+      p.set = (k) => {
+        m.uniforms.opacity.value = 0.5 * k;
+      };
+      return p;
+    }
+    function pool({ at, r, parent = root }) {
+      const m = softMat(16777215, true);
+      m.uniforms.color.value.copy(accent);
+      m.side = THREE.DoubleSide;
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(2 * r * TS2, 2 * r * TS2), m);
+      p.rotation.x = -Math.PI / 2;
+      p.position.copy(W3(...at));
+      parent.add(p);
+      p.set = (k) => {
+        m.uniforms.opacity.value = 0.6 * k;
+      };
+      return p;
+    }
+    function glow(points, size = 0.3, parent = root) {
+      const g = glowPoints(points.map((p) => W3(...p)), size);
+      parent.add(g);
+      g.set = (k) => {
+        g.material.uniforms.intensity.value = k;
+      };
+      return g;
+    }
+    function stage(w, d) {
+      plateWith(root, w, d, [[11, 11], [w - 11, 11], [11, d - 11], [w - 11, d - 11]], null);
+      return { w, d, top: 7 };
+    }
+    function finish(cx, cy, wk = 1, dk = 1) {
+      hazeAndShadow(root, cx, cy, wk, dk);
+      creases(first);
+    }
+    function events(names) {
+      const t = {};
+      const reset = () => names.forEach((n) => {
+        t[n] = null;
+      });
+      reset();
+      return {
+        reset,
+        dispatch(e, now2) {
+          if (!names.includes(e.type)) return false;
+          t[e.type] = now2;
+          return true;
+        },
+        at: (n) => t[n],
+        on: (n) => t[n] !== null,
+        since: (n, now2) => t[n] === null ? null : now2 - t[n],
+        ramp: (n, now2, ms) => t[n] === null ? 0 : clamp2((now2 - t[n]) / ms),
+        eased: (n, now2, ms) => t[n] === null ? 0 : ease(clamp2((now2 - t[n]) / ms))
+      };
+    }
+    return { THREE, W: W3, TS: TS2, root, TOP: 7, mats, outline, extrude, box: box2, cyl, lathe, tube, ball, pane, lines, group, hinge, rotor, slider, wheel, beam, pool, glow, stage, finish, events, clamp: clamp2, ease };
+  }
+
+  // engine/quality.js
+  var W = 200;
+  var H = 150;
+  function sample(ctx2, screen2, small, bg) {
+    small.drawImage(screen2, 0, 0, W, H);
+    const d = small.getImageData(0, 0, W, Math.floor(H * 0.93)).data;
+    return d;
+  }
+  function measure(d, accent) {
+    const rows = d.length / 4 / W;
+    let obj = 0, lit = 0, x0 = W, x1 = -1, y0 = rows, y1 = -1;
+    for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const dist = Math.abs(r - 18) + Math.abs(g - 19) + Math.abs(b - 20);
+      if (dist < 14) continue;
+      obj++;
+      const x = p % W, y = Math.floor(p / W);
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      if (max > 70 && max - min > 40) {
+        const n = Math.hypot(r, g, b) * Math.hypot(...accent) || 1;
+        if ((r * accent[0] + g * accent[1] + b * accent[2]) / n > 0.85) lit++;
+      }
+    }
+    return { obj, lit, fillW: x1 < 0 ? 0 : (x1 - x0 + 1) / W, fillH: y1 < 0 ? 0 : (y1 - y0 + 1) / rows, area: x1 < 0 ? 0 : (x1 - x0 + 1) * (y1 - y0 + 1) / (W * rows), edge: x0 === 0 || x1 === W - 1 || y0 === 0 };
+  }
+  function diff(a, b) {
+    let n = 0;
+    for (let i = 0; i < a.length; i += 4) if (Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]) > 18) n++;
+    return n / (a.length / 4);
+  }
+  var hex = (s) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16));
+  var LIMITS = { parts: 60, kinds: 20, moving: 3, area: 0.25, lastArea: 0.2, litArea: 0.03, still: 2, cuts: 2 };
+  async function measureScene({ sc, range, renderGlobal, screen: screen2, S, source }) {
+    const c = document.createElement("canvas");
+    c.width = W;
+    c.height = H;
+    const small = c.getContext("2d", { willReadFrequently: true });
+    const C = sc.inst.C, meshes = [];
+    C.scene.traverse((o) => {
+      if (o.isMesh || o.isLineSegments2) meshes.push(o);
+    });
+    const solid = meshes.filter((m) => m.isMesh && !m.userData.outline && m.geometry);
+    const kinds = new Set(solid.map((m) => {
+      m.geometry.computeBoundingBox();
+      const s = m.geometry.boundingBox.getSize(new C.THREE.Vector3());
+      return `${m.geometry.attributes.position.count}:${s.toArray().map((v) => (v / (Math.max(s.x, s.y, s.z) || 1)).toFixed(1)).join()}`;
+    }));
+    const n = Math.max(2, Math.min(17, range.len)), accent = hex(sc.sc.accent), rows = [];
+    let prev = null, stillRun = 0, stillMax = 0, firstPose = null, lastPose = null;
+    const pose = () => {
+      C.scene.updateMatrixWorld(true);
+      return solid.map((m) => m.matrixWorld.elements.join());
+    };
+    const emis = () => solid.map((m) => m.material && m.material.emissiveIntensity || 0);
+    let lastEm = null, litChanged = false, ms = 0;
+    const litSeen = /* @__PURE__ */ new Set();
+    const step = (range.len - 1) / (n - 1);
+    for (let i = 0; i < n; i++) {
+      const g = range.start + Math.round(i * step);
+      await renderGlobal(g);
+      const d = sample(null, screen2, small).slice(), m = measure(d, accent);
+      rows.push(m);
+      const p = pose(), e = emis();
+      if (!firstPose) firstPose = p;
+      lastPose = p;
+      if (lastEm) e.forEach((v, k) => {
+        if (Math.abs(v - lastEm[k]) > 0.05) {
+          litChanged = true;
+          litSeen.add(k);
+        }
+      });
+      lastEm = e;
+      if (prev) {
+        const f = diff(prev, d);
+        if (f < 15e-4) {
+          stillRun += step;
+          stillMax = Math.max(stillMax, stillRun);
+        } else stillRun = 0;
+        ms = Math.max(ms, f);
+      }
+      prev = d;
+    }
+    const movedParents = /* @__PURE__ */ new Set();
+    solid.forEach((m, k) => {
+      if (firstPose[k] !== lastPose[k]) movedParents.add(m.parent ? m.parent.uuid : m.uuid);
+      else if (litSeen.has(k)) movedParents.add(m.material.uuid);
+    });
+    await renderGlobal(range.start + Math.floor(range.len / 2));
+    const h1 = sample(null, screen2, small).slice();
+    await renderGlobal(range.start);
+    await renderGlobal(range.start + Math.floor(range.len / 2));
+    const h2 = sample(null, screen2, small).slice();
+    const best = rows.reduce((a, b) => b.area > a.area ? b : a), litMax = rows.reduce((a, b) => Math.max(a, b.lit / (W * H * 0.93)), 0), last2 = rows[rows.length - 1];
+    const src = source ? source(sc.sc.machine) : "";
+    const banned = ["Math.random", "Date.now", "new Date", "performance.now", "setTimeout", "setInterval", "requestAnimationFrame"].filter((w) => src.includes(w));
+    const fixedColor = /['"]#[0-9a-fA-F]{6}['"]/.test(src);
+    return { machine: sc.sc.machine, parts: solid.length, kinds: kinds.size, moving: movedParents.size, litChanged, area: +best.area.toFixed(3), lastArea: +last2.area.toFixed(3), lastEdge: last2.edge, litArea: +litMax.toFixed(4), stillSec: +(stillMax / S.fps).toFixed(2), maxChange: +ms.toFixed(4), cuts: (sc.inst.fig.shots || []).length, camera: sc.sc.camera || "shots", orbit: sc.sc.orbit || 0, zoom: sc.sc.zoom || null, repeat: diff(h1, h2) === 0, banned, fixedColor };
+  }
+  async function runQuality({ list, ranges, renderGlobal, screen: screen2, S, source }) {
+    const results = [];
+    for (const { sc, i } of list) {
+      const m = await measureScene({ sc, range: ranges[i], renderGlobal, screen: screen2, S, source });
+      results.push({ m, items: judge(m) });
+    }
+    return { results, ok: results.every((r) => r.items.every((x) => x.ok)) };
+  }
+  function judge(m) {
+    const L = LIMITS, moved = m.camera === "shots" ? m.cuts >= L.cuts : m.orbit !== 0 || m.zoom;
+    return [
+      { name: "部品の数", ok: m.parts >= L.parts, val: `${m.parts} 個（目安 ${L.parts} 個以上）`, fix: "箱を増やすのではなく、継ぎ目、取っ手、ねじ、窓枠、ボタンなど実物にある部品を足してください" },
+      { name: "形の種類", ok: m.kinds >= L.kinds, val: `${m.kinds} 種類（目安 ${L.kinds} 種類以上）`, fix: "kit.extrude の輪郭、kit.cyl の円柱、kit.pane の斜めの板を使い、箱以外の形を増やしてください" },
+      { name: "動く・点灯する部品", ok: m.moving >= L.moving, val: `${m.moving} 組（目安 ${L.moving} 組以上）`, fix: "kit.hinge・kit.rotor・kit.slider・kit.wheel で動く部品を増やし、defaultScript で動かしてください" },
+      { name: "画面での大きさ", ok: m.area >= L.area, val: `画面の ${Math.round(m.area * 100)}%（目安 ${Math.round(L.area * 100)}%以上）`, fix: "view の dist を小さくするか、shots の zoom を上げてください" },
+      { name: "最後の構図", ok: !m.lastEdge && m.lastArea >= L.lastArea, val: m.lastEdge ? "画面の端で切れています" : `画面の ${Math.round(m.lastArea * 100)}%（目安 ${Math.round(L.lastArea * 100)}%以上）`, fix: "最後のカットの target を機械の中心にして、機械が小さければ zoom を上げ、切れていれば下げてください" },
+      { name: "光", ok: m.litArea >= L.litArea, val: `光る面積 ${(m.litArea * 100).toFixed(1)}%（目安 ${Math.round(L.litArea * 100)}%以上）`, fix: "見せ場の面を kit.mats.light() にして広げてください。kit.beam や kit.pool も使えます。点の glow だけで増やさないでください" },
+      { name: "止まっている時間", ok: m.stillSec <= L.still, val: `最長 ${m.stillSec} 秒（目安 ${L.still} 秒以内）`, fix: "台本の間隔を詰めるか、カメラの動きを足してください" },
+      { name: "カメラ", ok: !!moved, val: m.camera === "shots" ? `カット ${m.cuts} 個` : `${m.camera}`, fix: "shots に2カット以上入れて、全景と見せ場への寄りを作ってください（カメラなしの指定なら、この項目は無視して構いません）" },
+      { name: "同じ絵になるか", ok: m.repeat && m.banned.length === 0, val: m.banned.length ? `使えないものがあります: ${m.banned.join(", ")}` : m.repeat ? "同じコマは同じ絵です" : "同じコマで絵が変わります", fix: "動きは now と台本だけで決め、乱数は C.rng() を使ってください" },
+      { name: "色の指定", ok: !m.fixedColor, val: m.fixedColor ? "ファイルに色コードが直接書かれています" : "問題ありません", fix: "光る色は settings.js の accent で決まります。ファイルから色コードを消してください" }
+    ];
+  }
+  function formatQuality(r) {
+    const out = [];
+    r.results.forEach(({ m, items }) => {
+      const ng = items.filter((x) => !x.ok);
+      out.push(`【${m.machine}】${ng.length ? `要修正 ${ng.length} 件` : "合格"}`);
+      items.forEach((x) => out.push(`${x.ok ? "○" : "×"} ${x.name}: ${x.val}`));
+      if (ng.length) {
+        out.push("直し方:");
+        ng.forEach((x) => out.push(`- ${x.name}: ${x.fix}`));
+      }
+    });
+    out.push(r.ok ? "見た目は最後に人の目で確かめてください。" : "上の結果をそのままChatGPTに貼ると、直してもらえます。");
+    return out.join("\n");
+  }
 
   // engine/player.js
   var FONT = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
@@ -36308,6 +36689,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     return { sc, cs, inst, canvas, dom };
   }
   var addCalls = 0;
+  var userMade = /* @__PURE__ */ new Set();
   function loadMyMachine(file) {
     return new Promise((resolve, reject) => {
       if (!/^[A-Za-z0-9_-]+\.js$/.test(file)) {
@@ -36336,23 +36718,23 @@ If you want to offset all timestamps of a track such that the first one is zero,
       document.head.appendChild(el);
     });
   }
-  async function drawOverlay(scene, W2, H) {
+  async function drawOverlay(scene, W3, H2) {
     const svg = scene.dom.querySelector("svg");
     if (svg && svg.childNodes.length) {
       const copy = svg.cloneNode(true);
       copy.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-      copy.setAttribute("width", W2);
-      copy.setAttribute("height", H);
+      copy.setAttribute("width", W3);
+      copy.setAttribute("height", H2);
       const img = new Image();
       img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(copy));
       await img.decode();
-      ctx.drawImage(img, 0, 0, W2, H);
+      ctx.drawImage(img, 0, 0, W3, H2);
     }
     const cap = scene.dom.querySelector(".ig3-cap");
     if (cap && cap.style.display !== "none") {
       const hint = (cap.firstChild && cap.firstChild.textContent || "").toUpperCase();
       const ro = scene.inst.ro ? scene.inst.ro.textContent : "";
-      const y = H - H * 0.024 - 1, left = W2 * 0.022, right = W2 - W2 * 0.022;
+      const y = H2 - H2 * 0.024 - 1, left = W3 * 0.022, right = W3 - W3 * 0.022;
       ctx.save();
       ctx.font = `12px ${FONT}`;
       ctx.textBaseline = "bottom";
@@ -36390,7 +36772,16 @@ If you want to offset all timestamps of a track such that the first one is zero,
     const G32 = window.ISOGLOW3D;
     window.addMachine = (id, make) => {
       addCalls++;
-      G32.machines[id] = make;
+      G32.machines[id] = (C, opts) => {
+        Object.defineProperty(C, "kit", { configurable: true, get() {
+          const k = makeKit(C);
+          Object.defineProperty(C, "kit", { value: k });
+          return k;
+        } });
+        return make(C, opts);
+      };
+      G32.machines[id].source = String(make);
+      userMade.add(id);
     };
     try {
       for (const file of S.myMachines || []) await loadMyMachine(file);
@@ -36545,12 +36936,44 @@ If you want to offset all timestamps of a track such that the first one is zero,
         show(frame);
       }
     };
-    window.__vta = { total, renderGlobal, exportMp4, screen };
+    const quality = async () => {
+      const list = scenes.map((sc, i) => ({ sc, i })).filter((x) => userMade.has(x.sc.sc.machine));
+      return runQuality({ list, ranges, renderGlobal, ctx, screen, S, source: (id) => G32.machines[id].source });
+    };
+    window.__vta = { total, renderGlobal, exportMp4, screen, quality, scenes, ranges };
     const firstOk = await show(0);
     playBtn.disabled = seek.disabled = false;
     if (!firstOk) return;
     exportBtn.disabled = false;
     showStatus(`準備ができました。${scenes.length} 場面・${total} コマ・${(total / S.fps).toFixed(2)} 秒`);
+    if (S.scenes.some((sc) => userMade.has(sc.machine))) {
+      const box2 = $("quality"), out = $("quality-text"), copy = $("quality-copy");
+      box2.hidden = false;
+      out.textContent = "品質チェック中…";
+      playBtn.disabled = seek.disabled = exportBtn.disabled = true;
+      try {
+        const r = await quality();
+        out.textContent = formatQuality(r);
+        box2.classList.toggle("ng", !r.ok);
+      } catch (e) {
+        out.textContent = new StepError("品質チェック", e).message;
+        box2.classList.add("ng");
+      }
+      playBtn.disabled = seek.disabled = exportBtn.disabled = false;
+      copy.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(out.textContent);
+          copy.textContent = "コピーしました";
+        } catch (_) {
+          const r = document.createRange();
+          r.selectNodeContents(out);
+          getSelection().removeAllRanges();
+          getSelection().addRange(r);
+          copy.textContent = "選択しました。⌘Cでコピー";
+        }
+      };
+      await show(0);
+    }
   }
   main().catch((e) => showStatus(new StepError("ページの準備", e).message, true));
 })();

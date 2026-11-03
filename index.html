@@ -21,6 +21,10 @@
   #status { margin-top: 12px; font-size: 13px; color: var(--muted); white-space: pre-wrap; min-height: 1.5em; }
   #status.error { color: var(--error); }
   #hidden { position: absolute; width: 0; height: 0; overflow: hidden; }
+  #quality { margin-top: 16px; padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+  #quality.ng { border-color: var(--error); }
+  .q-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  #quality-text { margin: 8px 0 0; white-space: pre-wrap; font-family: inherit; line-height: 1.7; }
   footer { margin-top: 32px; font-size: 12px; color: var(--muted); line-height: 1.7; }
   footer a { color: var(--muted); }
 </style>
@@ -40,6 +44,10 @@
     <button id="export" class="primary" disabled>MP4で書き出す</button>
   </div>
   <div id="status" role="status"></div>
+  <section id="quality" hidden>
+    <div class="q-head"><strong>品質チェック</strong><button id="quality-copy">結果をコピー</button></div>
+    <pre id="quality-text"></pre>
+  </section>
   <div id="hidden" aria-hidden="true"></div>
   <footer>
     描画の土台は <a href="https://iso-glow.vercel.app">iso-glow</a>（April Zhu・MIT）と three.js（MIT）、MP4の書き出しは mp4-muxer（Vanilagy・MIT）を使っています。ライセンス文は licenses フォルダにあります。
